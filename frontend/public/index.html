@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <script>if(!/\/$/.test(location.pathname)&&!/\.[a-z0-9]+$/i.test(location.pathname))location.replace(location.pathname+"/"+location.search)</script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0B0A1A">
   <title>Promptly Wrong</title>
@@ -15,6 +16,7 @@
 <body class="phone">
   <div id="app"></div>
   <div id="toasts" aria-live="polite"></div>
+  <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

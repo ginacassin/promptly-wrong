@@ -2,6 +2,9 @@
 'use strict';
 
 const BASE = location.pathname.replace(/[^/]*$/, '');
+// Backend location comes from config.js (generated at container start). Default: same origin, "api/".
+const API = (() => { const u = new URL((window.PW_CONFIG && window.PW_CONFIG.apiBase) || 'api/', location.href); if (!u.pathname.endsWith('/')) u.pathname += '/'; return u; })();
+const apiUrl = (p) => new URL(p, API).href;
 const $app = document.getElementById('app');
 const $toasts = document.getElementById('toasts');
 const MAX_TEXT = 120;
@@ -46,7 +49,7 @@ const I18N = {
     connecting: 'Connecting…', offline: 'Connection lost. Reconnecting…',
     e_no_room: 'Room not found. Check the code.', e_started: 'That game has already started.', e_full: 'The room is full.',
     e_bad_name: 'Pick a nickname.', e_name_taken: 'That nickname is taken.', e_kicked: 'You were removed from the room.',
-    e_bad_image: "We couldn't use that image. Try another.", e_bad_text: 'Write something first.', e_bad_state: 'Too late for that one!', e_server: 'Something went wrong.',
+    e_bad_image: "We couldn't use that image. Try another.", e_bad_text: 'Write something first.', e_bad_state: 'Too late for that one!', e_server: 'Something went wrong.', e_slow_down: 'Easy there! Too many actions.',
     e_img: "Couldn't read that image.",
     sugg: ['A cat doing taxes', 'A dragon eating spaghetti on the moon', 'Grandma surfing a giant wave', 'A robot crying at a wedding', 'A penguin DJ at a beach party', 'A pirate ship made of cheese', 'A wizard stuck in traffic', 'Dinosaurs playing poker'],
   },
@@ -88,7 +91,7 @@ const I18N = {
     connecting: 'Conectando…', offline: 'Conexión perdida. Reconectando…',
     e_no_room: 'Sala no encontrada. Revisa el código.', e_started: 'Esa partida ya ha empezado.', e_full: 'La sala está llena.',
     e_bad_name: 'Elige un apodo.', e_name_taken: 'Ese apodo ya está en uso.', e_kicked: 'Te han quitado de la sala.',
-    e_bad_image: 'No pudimos usar esa imagen. Prueba con otra.', e_bad_text: 'Escribe algo primero.', e_bad_state: '¡Demasiado tarde!', e_server: 'Algo salió mal.',
+    e_bad_image: 'No pudimos usar esa imagen. Prueba con otra.', e_bad_text: 'Escribe algo primero.', e_bad_state: '¡Demasiado tarde!', e_server: 'Algo salió mal.', e_slow_down: '¡Despacio! Demasiadas acciones.',
     e_img: 'No se pudo leer esa imagen.',
     sugg: ['Un gato haciendo la declaración de la renta', 'Un dragón comiendo espaguetis en la luna', 'Una abuela surfeando una ola gigante', 'Un robot llorando en una boda', 'Un pingüino DJ en una fiesta en la playa', 'Un barco pirata hecho de queso', 'Un mago atrapado en un atasco', 'Dinosaurios jugando al póker'],
   },
@@ -181,8 +184,7 @@ else if (playerSess) role = 'player';
 // ======================================================= network
 let ws;
 function connect() {
-  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  ws = new WebSocket(`${proto}://${location.host}${BASE}ws`);
+    ws = new WebSocket(apiUrl('ws').replace(/^http/, 'ws'));
   ws.onopen = () => {
     online = true;
     if (role === 'host' && hostSess) send({ t: 'host_resume', code: hostSess.code, token: hostSess.token });
@@ -293,7 +295,7 @@ function stepCard(step, i, opts = {}) {
   const kind = step.img || step.type === 'image' ? 'image' : 'text';
   let box;
   if (opts.suspense) box = h('div', { class: 'box susp' }, h('span', null, '•'), h('span', null, '•'), h('span', null, '•'));
-  else if (step.type === 'image') box = h('div', { class: 'box' }, step.img ? h('img', { src: BASE + step.img, alt: '' }) : h('span', { class: 'muted small' }, t('no_image')));
+  else if (step.type === 'image') box = h('div', { class: 'box' }, step.img ? h('img', { src: apiUrl(step.img), alt: '' }) : h('span', { class: 'muted small' }, t('no_image')));
   else box = h('div', { class: 'box' + (opts.type ? ' type-me' : ''), 'data-full': step.text || '' }, opts.type ? '' : (step.text || t('no_text')));
   return h('div', { class: `step ${step.type} ${kind} ${opts.cur ? 'cur' : ''} ${opts.enter ? 'enter' : ''}`, 'data-i': i },
     h('div', { class: 'lbl' }, stepLabel(step, i), ' · ', avatar(step.hue, ''), step.author), box);
@@ -379,7 +381,7 @@ function lobbyView() {
         h('span', { class: 'muted small' }, t('room_code')),
         h('button', { class: 'roomcode', 'aria-label': t('room_code') + ' ' + S.code, onclick: () => copyText(S.code) }, S.code, h('small', null, '⧉')),
         h('p', null, t('join_at', { url: shown })),
-        h('div', { class: 'row' }, h('div', { class: 'qr' }, h('img', { src: `${BASE}qr.svg?u=${encodeURIComponent(joinUrl)}`, alt: 'QR' })), h('span', { class: 'muted small' }, t('scan'))),
+        h('div', { class: 'row' }, h('div', { class: 'qr' }, h('img', { src: apiUrl('qr.svg?u=' + encodeURIComponent(joinUrl)), alt: 'QR' })), h('span', { class: 'muted small' }, t('scan'))),
         h('div', { class: 'col', style: 'width:min(24em,100%)' },
           stepper(t('players'), S.expected, Math.max(3, n), 12, (v) => set({ players: v })),
           stepper(t('rounds'), S.rounds, 3, S.expected, (v) => set({ rounds: v })),
@@ -511,7 +513,7 @@ function taskView() {
       h('button', { class: 'btn secondary block', onclick: () => { const s = t('sugg'); field.value = draft.text = s[Math.floor(Math.random() * s.length)]; field.dispatchEvent(new Event('input')); } }, '🎲 ' + t('surprise')));
     else {
       body.push(h('h2', null, t('guess_title')));
-      body.push(task.input && task.input.img ? h('img', { class: 'guessimg', src: BASE + task.input.img, alt: '' }) : h('div', { class: 'card center muted' }, t('no_image')), field, cnt);
+      body.push(task.input && task.input.img ? h('img', { class: 'guessimg', src: apiUrl(task.input.img), alt: '' }) : h('div', { class: 'card center muted' }, t('no_image')), field, cnt);
     }
     mount(h('main', { class: 'screen top' }, head, h('div', { class: 'col grow' }, body), btn));
     return;

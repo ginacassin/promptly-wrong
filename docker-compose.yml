@@ -1,0 +1,19 @@
+# Local stack: redis + 2 backend replicas + frontend (nginx proxies /api to the backend).
+# docker compose up --build  ->  http://localhost:8080
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+  backend:
+    build: ./backend
+    environment:
+      REDIS_URL: redis://redis:6379
+    depends_on: [redis]
+    deploy:
+      replicas: 2
+  frontend:
+    build: ./frontend
+    environment:
+      BACKEND_URL: http://backend:3000
+    ports: ["8080:80"]
+    depends_on: [backend]
