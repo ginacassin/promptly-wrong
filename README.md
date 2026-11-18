@@ -21,7 +21,7 @@ browser ──▶ │  /       → frontend (nginx, static)                │
                                         ▼
                                       Redis  (rooms, images, timers, pub/sub)
 ```
-- **frontend/**: static HTML/CSS/JS served by nginx. `config.js` is generated at container start, so the same image works on any domain.
+- **frontend/**: static HTML/CSS/JS served by nginx. Every visual (logo mark, icons, avatars, splashes, trophy, QR modules) is drawn in CSS; the only bitmaps are player uploads. `config.js` is generated at container start, so the same image works on any domain.
 - **backend/**: stateless Node API. With `REDIS_URL` set, any number of replicas can run: room state is locked per room in Redis, images are stored in Redis with a TTL, round deadlines live in a sorted set (any replica fires them, exactly once), and changes are fanned out to every replica over pub/sub. No sticky sessions needed; if a replica dies, clients reconnect to another and keep their seat. Without `REDIS_URL` it runs single-instance in memory.
 
 ## Configuration
@@ -56,5 +56,3 @@ Project **Promptly Wrong**, three services:
 
 Serving under a sub-path (e.g. `bots.rabbia.net/promptlywrong`): frontend path `/promptlywrong` and backend path `/promptlywrong/api`, both with Strip Path on.
 
-## Assets
-Optional AI art in `frontend/public/assets/` (UI falls back if missing): `bg-tv.webp`, `bg-phone.webp`, `hero.webp`, `og-image.png`, `trophy.webp`. Fonts (Rubik Glitch, Rubik, Inter, SIL OFL) are self-hosted.

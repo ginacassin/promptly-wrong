@@ -92,6 +92,16 @@ async function main() {
         return res.end(img.buf);
       }
 
+      if (/(^|\/)qr\.json$/.test(p)) {
+        // QR modules as data so the frontend can draw them with CSS
+        const text = (url.searchParams.get('u') || '').slice(0, 300);
+        if (!/^https?:\/\//.test(text)) { res.writeHead(400); return res.end(); }
+        const q = QRCode.create(text, { errorCorrectionLevel: 'M' });
+        const bits = Array.from(q.modules.data, (b) => (b ? '1' : '0')).join('');
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600' });
+        return res.end(JSON.stringify({ size: q.modules.size, bits }));
+      }
+
       if (/(^|\/)qr\.svg$/.test(p)) {
         const text = (url.searchParams.get('u') || '').slice(0, 300);
         if (!/^https?:\/\//.test(text)) { res.writeHead(400); return res.end(); }
