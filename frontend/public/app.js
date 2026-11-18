@@ -8,14 +8,17 @@ const apiUrl = (p) => new URL(p, API).href;
 const $app = document.getElementById('app');
 const $toasts = document.getElementById('toasts');
 const MAX_TEXT = 120;
+const previewOnly = new URLSearchParams(location.search).get('preview') === '1';
 
 // ======================================================= i18n
 const I18N = {
   en: {
-    home_kicker: 'THE AI TELEPHONE GAME', start_note: 'One screen hosts. Everyone else plays on their phone.',
+    start_note: 'One screen hosts. Everyone else plays on their phone.',
     setup_kicker: 'MAKE A LITTLE CHAOS', lobby_hint: 'Scan to join or share the room code', players_joined: 'PLAYERS IN THE ROOM',
     round_kicker: 'THE MEANING IS MOVING', reveal_kicker: 'LET’S SEE WHERE IT WENT', results_kicker: 'THE DAMAGE IS DONE',
     step_prompt_hint: 'Start with a wonderfully specific idea.', step_guess_hint: 'You only get the picture. Trust your instincts.',
+    press_to_copy: 'Tap to copy', reveal_keys: '← → or Space to reveal', progress_label: 'Player progress', preview_mode: 'Preview mode: start the game server to use rooms and multiplayer.',
+    copied_room: 'Room code copied', players_ready: '{n} players joined', connected: 'Connected', disconnected: 'Reconnecting',
     tagline: 'The AI telephone game where prompts go hilariously wrong.',
     play: 'Play', howto: 'How to play', have_code: 'I have a room code', close: 'Close', back: 'Back',
     how1: 'Everyone joins on their phone and writes a prompt.',
@@ -58,10 +61,12 @@ const I18N = {
     sugg: ['A cat doing taxes', 'A dragon eating spaghetti on the moon', 'Grandma surfing a giant wave', 'A robot crying at a wedding', 'A penguin DJ at a beach party', 'A pirate ship made of cheese', 'A wizard stuck in traffic', 'Dinosaurs playing poker'],
   },
   es: {
-    home_kicker: 'EL TELÉFONO ROTO CON IA', start_note: 'Una pantalla para el anfitrión. Todos los demás juegan desde el móvil.',
+    start_note: 'Una pantalla para el anfitrión. Todos los demás juegan desde el móvil.',
     setup_kicker: 'VAMOS A LIARLA UN POCO', lobby_hint: 'Escanea para entrar o comparte el código de sala', players_joined: 'JUGADORES EN LA SALA',
     round_kicker: 'EL SIGNIFICADO ESTÁ CAMBIANDO', reveal_kicker: 'A VER HASTA DÓNDE HA LLEGADO', results_kicker: 'EL DESASTRE YA ESTÁ HECHO',
     step_prompt_hint: 'Empieza con una idea maravillosamente concreta.', step_guess_hint: 'Solo tienes la imagen. Déjate llevar.',
+    press_to_copy: 'Pulsa para copiar', reveal_keys: '← → o Espacio para revelar', progress_label: 'Progreso de jugadores', preview_mode: 'Modo de vista previa: inicia el servidor para usar las salas y el multijugador.',
+    copied_room: 'Código de sala copiado', players_ready: '{n} jugadores dentro', connected: 'Conectado', disconnected: 'Reconectando',
     tagline: 'El teléfono roto con IA donde los prompts se tuercen de lo lindo.',
     play: 'Jugar', howto: 'Cómo jugar', have_code: 'Tengo un código de sala', close: 'Cerrar', back: 'Volver',
     how1: 'Todos entran desde el móvil y escriben un prompt.',
@@ -148,8 +153,7 @@ function avatar(hue, cls = '') {
 }
 function logo(size = 'xl') {
   return h('div', { class: 'logo ' + size, role: 'img', 'aria-label': 'Promptly Wrong' },
-    h('span', { class: 'l1' }, 'Promptly'), h('span', { class: 'l2' }, 'Wrong'),
-    h('img', { class: 'mark', src: 'icon.svg', alt: '' }));
+    h('span', { class: 'l1' }, 'Promptly'), h('span', { class: 'l2' }, 'Wrong'));
 }
 function toast(msg, type = 'ok') {
   const el = h('div', { class: 'toast ' + (type === 'error' ? 'error' : '') },
@@ -166,7 +170,7 @@ async function copyText(text) {
     try { document.execCommand('copy'); } catch {}
     ta.remove();
   }
-  toast(t('copied'));
+  toast(t(text === S?.code ? 'copied_room' : 'copied'));
 }
 const fmt = (ms) => { const s = Math.ceil(ms / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
 const mount = (...nodes) => { $app.replaceChildren(...nodes); };
@@ -203,6 +207,7 @@ function connect() {
   ws.onclose = () => { online = false; render(); setTimeout(connect, 1500); };
 }
 function send(obj) {
+  if (previewOnly) { toast(t('preview_mode'), 'error'); return false; }
   if (ws && ws.readyState === 1) { ws.send(JSON.stringify(obj)); return true; }
   toast(t('offline'), 'error');
   return false;
@@ -279,15 +284,15 @@ function stepper(label, val, min, max, onChange) {
   return h('div', { class: 'stepper' },
     h('span', null, label),
     h('span', { class: 'row' },
-      h('button', { 'aria-label': '−', disabled: val <= min, onclick: () => onChange(val - 1) }, '−'),
+      h('button', { 'aria-label': `${label} −`, disabled: val <= min, onclick: () => onChange(val - 1) }, '−'),
       h('span', { class: 'val', 'aria-live': 'polite' }, String(val)),
-      h('button', { 'aria-label': '+', disabled: val >= max, onclick: () => onChange(val + 1) }, '+')));
+      h('button', { 'aria-label': `${label} +`, disabled: val >= max, onclick: () => onChange(val + 1) }, '+')));
 }
 function toggle(label, on, onChange) {
   return h('div', { class: 'stepper' }, h('span', null, label),
     h('span', { class: 'toggle', role: 'group' },
-      h('button', { class: on ? 'on' : '', onclick: () => onChange(true) }, t('on')),
-      h('button', { class: !on ? 'on' : '', onclick: () => onChange(false) }, t('off'))));
+      h('button', { class: on ? 'on' : '', 'aria-pressed': String(on), onclick: () => onChange(true) }, t('on')),
+      h('button', { class: !on ? 'on' : '', 'aria-pressed': String(!on), onclick: () => onChange(false) }, t('off'))));
 }
 function showHowTo() {
   const m = h('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', onclick: (e) => { if (e.target === m) m.remove(); } },
@@ -332,7 +337,6 @@ function landingView() {
     h('div', { class: 'home-orbit orbit-a', 'aria-hidden': 'true' }, '✳'),
     h('div', { class: 'home-orbit orbit-b', 'aria-hidden': 'true' }, '⌁'),
     h('div', { class: 'home-hero' },
-      h('span', { class: 'eyebrow' }, h('i', null), t('home_kicker')),
       logo('xl'),
       h('p', { class: 'home-tagline' }, t('tagline')),
       h('p', { class: 'home-note' }, t('start_note')),
@@ -340,8 +344,7 @@ function landingView() {
         h('button', { class: 'btn primary big', onclick: () => { V = 'setup'; render(); } }, '▶ ' + t('play')),
         h('button', { class: 'btn secondary big', onclick: showHowTo }, t('howto'))),
       h('button', { class: 'join-link', onclick: () => { V = 'join'; render(); } }, t('have_code'))),
-    h('div', { class: 'home-steps', 'aria-label': 'How the game flows' },
-      h('span', null, '01 · ' + t('s_prompt')), h('b', null, '→'), h('span', null, '02 · ' + t('s_image')), h('b', null, '→'), h('span', null, '03 · ' + t('s_guess')))));
+    ));
 }
 function setupView() {
   const set = (patch) => { cfg = Object.assign(cfg, patch); cfg.rounds = Math.max(3, Math.min(cfg.rounds, cfg.players)); LS.set('pw_cfg', cfg); render(); };
@@ -394,7 +397,7 @@ function lobbyView() {
     h('div', { class: 'lobby-grid' },
       h('div', { class: 'col', style: 'align-items:flex-start' },
         h('span', { class: 'muted small' }, t('room_code')),
-        h('button', { class: 'roomcode', 'aria-label': t('room_code') + ' ' + S.code, onclick: () => copyText(S.code) }, S.code, h('small', null, '⧉')),
+    h('button', { class: 'roomcode', 'aria-label': t('room_code') + ' ' + S.code + '. ' + t('press_to_copy'), onclick: () => copyText(S.code) }, S.code, h('small', { 'aria-hidden': 'true' }, '⧉')),
         h('p', { class: 'lobby-instruction' }, t('join_at', { url: shown })),
         h('span', { class: 'small muted' }, t('lobby_hint')),
         h('div', { class: 'row' }, h('div', { class: 'qr' }, h('img', { src: apiUrl('qr.svg?u=' + encodeURIComponent(joinUrl)), alt: 'QR' })), h('span', { class: 'muted small' }, t('scan'))),
@@ -403,7 +406,7 @@ function lobbyView() {
           stepper(t('rounds'), S.rounds, 3, S.expected, (v) => set({ rounds: v })),
           toggle(t('timer'), S.timerOn, (v) => set({ timer: v })))),
       h('div', { class: 'col' },
-        h('h3', null, t('n_players', { n, max: S.expected })),
+        h('h3', { 'aria-live': 'polite' }, t('n_players', { n, max: S.expected })),
         h('div', { class: 'grid-players' }, S.players.map((p) =>
           playerChip(p, [h('span', { class: 'tick', 'aria-label': 'ready' }, p.connected ? '✓' : ''),
             h('button', { class: 'chip-btn', style: 'background:none;border:0;color:var(--color-muted);cursor:pointer;min-width:32px;min-height:32px', 'aria-label': t('kick') + ' ' + p.name, onclick: () => send({ t: 'kick', id: p.id }) }, '×')]))),
@@ -419,11 +422,11 @@ function roundView() {
     h('h2', null, t('round_of', { r: S.round + 1, R: S.rounds })),
     timerPill(),
     h('p', { style: 'max-width:30em' }, t('i_' + type)),
-    h('div', { class: 'row center', style: 'gap:1.2em;margin-top:.5em' }, S.players.map((p) =>
-      h('div', { class: 'pstat ' + (p.done ? 'done' : 'work') }, avatar(p.hue), p.name, h('span', null, p.done ? t('done') + ' ✓' : (p.connected ? t('working') : '⚠ ' + t('working')))))),
+    h('div', { class: 'row center round-player-grid', style: 'gap:1.2em;margin-top:.5em', 'aria-label': t('progress_label') }, S.players.map((p) =>
+      h('div', { class: 'pstat ' + (p.done ? 'done' : 'work'), 'aria-label': `${p.name}: ${p.done ? t('done') : p.connected ? t('working') : t('disconnected')}` }, avatar(p.hue), p.name, h('span', null, p.done ? t('done') + ' ✓' : (p.connected ? t('working') : '⚠ ' + t('disconnected')))))),
     h('span', { class: 'grow' }),
-    h('div', { style: 'width:min(40em,100%)' }, h('div', { class: 'bar' }, h('i', { style: `width:${(done / S.players.length) * 100}%` })),
-      h('p', { class: 'small muted', style: 'margin-top:.4em' }, t('n_done', { n: done, N: S.players.length }))),
+    h('div', { class: 'progress-wrap', role: 'group', 'aria-label': t('progress_label') }, h('div', { class: 'bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(S.players.length), 'aria-valuenow': String(done), 'aria-label': t('progress_label') }, h('i', { style: `width:${(done / S.players.length) * 100}%` })),
+      h('p', { class: 'small muted', style: 'margin-top:.4em', 'aria-live': 'polite' }, t('n_done', { n: done, N: S.players.length }))),
     h('button', { class: 'btn secondary', onclick: () => send({ t: 'skip' }) }, t('skip'))));
 }
 
@@ -444,7 +447,8 @@ function drawReveal(opts = {}) {
   mount(h('main', { class: 'screen reveal-screen' },
     h('div', { class: 'row hdr' }, h('div', { class: 'title-stack' }, h('span', { class: 'eyebrow' }, t('reveal_kicker')), h('h2', null, t('chain_of', { c: rv.c + 1, C }))), dots, h('span', { class: 'grow' }), h('span', { class: 'muted' }, t('started_by', { name: chain.owner }))),
     car,
-    h('div', { class: 'row center' },
+    h('div', { class: 'row center reveal-controls' },
+      h('span', { class: 'reveal-key-hint muted small' }, t('reveal_keys')),
       h('button', { class: 'btn secondary', disabled: rv.busy || (rv.c === 0 && rv.s === 0), onclick: revealPrev }, '◀ ' + t('prev_step')),
       h('button', { class: 'btn primary big', disabled: rv.busy, onclick: revealNext }, (last ? (lastChain ? t('see_results') : t('next_chain')) : t('next_step')) + ' ▶'))));
   const cur = car.querySelector('.step.cur');
@@ -521,7 +525,7 @@ function taskView() {
   if (task.type === 'prompt' || task.type === 'guess') {
     const isPrompt = task.type === 'prompt';
     const key = isPrompt ? 'text' : 'guess';
-    const cnt = h('div', null, counter(draft[key]));
+    const cnt = h('div', { 'aria-live': 'polite' }, counter(draft[key]));
     const btn = h('button', { class: 'btn primary big block', disabled: !draft[key].trim() || draft.busy, onclick: () => { draft.busy = true; btn.disabled = true; btn.textContent = t('sending'); send({ t: 'submit', data: draft[key] }); } }, isPrompt ? t('send_prompt') : t('send_guess'));
     const field = h(isPrompt ? 'textarea' : 'input', { type: isPrompt ? null : 'text', value: draft[key], maxlength: String(MAX_TEXT), placeholder: isPrompt ? t('prompt_ph') : t('guess_ph'), 'aria-label': isPrompt ? t('write_prompt') : t('guess_ph'), autocomplete: 'off',
       oninput: (e) => { draft[key] = e.target.value; cnt.replaceChildren(counter(draft[key])); btn.disabled = !draft[key].trim() || draft.busy; } });
@@ -615,6 +619,7 @@ function render() {
   return landingView();
 }
 
-connect();
+if (previewOnly) online = true;
+else connect();
 render();
 })();
