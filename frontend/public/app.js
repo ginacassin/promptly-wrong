@@ -12,6 +12,10 @@ const MAX_TEXT = 120;
 // ======================================================= i18n
 const I18N = {
   en: {
+    home_kicker: 'THE AI TELEPHONE GAME', start_note: 'One screen hosts. Everyone else plays on their phone.',
+    setup_kicker: 'MAKE A LITTLE CHAOS', lobby_hint: 'Scan to join or share the room code', players_joined: 'PLAYERS IN THE ROOM',
+    round_kicker: 'THE MEANING IS MOVING', reveal_kicker: 'LET’S SEE WHERE IT WENT', results_kicker: 'THE DAMAGE IS DONE',
+    step_prompt_hint: 'Start with a wonderfully specific idea.', step_guess_hint: 'You only get the picture. Trust your instincts.',
     tagline: 'The AI telephone game where prompts go hilariously wrong.',
     play: 'Play', howto: 'How to play', have_code: 'I have a room code', close: 'Close', back: 'Back',
     how1: 'Everyone joins on their phone and writes a prompt.',
@@ -54,6 +58,10 @@ const I18N = {
     sugg: ['A cat doing taxes', 'A dragon eating spaghetti on the moon', 'Grandma surfing a giant wave', 'A robot crying at a wedding', 'A penguin DJ at a beach party', 'A pirate ship made of cheese', 'A wizard stuck in traffic', 'Dinosaurs playing poker'],
   },
   es: {
+    home_kicker: 'EL TELÉFONO ROTO CON IA', start_note: 'Una pantalla para el anfitrión. Todos los demás juegan desde el móvil.',
+    setup_kicker: 'VAMOS A LIARLA UN POCO', lobby_hint: 'Escanea para entrar o comparte el código de sala', players_joined: 'JUGADORES EN LA SALA',
+    round_kicker: 'EL SIGNIFICADO ESTÁ CAMBIANDO', reveal_kicker: 'A VER HASTA DÓNDE HA LLEGADO', results_kicker: 'EL DESASTRE YA ESTÁ HECHO',
+    step_prompt_hint: 'Empieza con una idea maravillosamente concreta.', step_guess_hint: 'Solo tienes la imagen. Déjate llevar.',
     tagline: 'El teléfono roto con IA donde los prompts se tuercen de lo lindo.',
     play: 'Jugar', howto: 'Cómo jugar', have_code: 'Tengo un código de sala', close: 'Cerrar', back: 'Volver',
     how1: 'Todos entran desde el móvil y escriben un prompt.',
@@ -320,19 +328,26 @@ function typewriter(el, ms = 800) {
 
 // ======================================================= views: no session
 function landingView() {
-  mount(h('main', { class: 'screen mid' },
-    h('div', { class: 'col center', style: 'align-items:center;gap:1.2em' },
+  mount(h('main', { class: 'screen home-screen' },
+    h('div', { class: 'home-orbit orbit-a', 'aria-hidden': 'true' }, '✳'),
+    h('div', { class: 'home-orbit orbit-b', 'aria-hidden': 'true' }, '⌁'),
+    h('div', { class: 'home-hero' },
+      h('span', { class: 'eyebrow' }, h('i', null), t('home_kicker')),
       logo('xl'),
-      h('p', { class: 'muted', style: 'max-width:28em;margin-top:.8em' }, t('tagline')),
-      h('div', { class: 'row center', style: 'margin-top:.6em' },
+      h('p', { class: 'home-tagline' }, t('tagline')),
+      h('p', { class: 'home-note' }, t('start_note')),
+      h('div', { class: 'row center home-actions' },
         h('button', { class: 'btn primary big', onclick: () => { V = 'setup'; render(); } }, '▶ ' + t('play')),
         h('button', { class: 'btn secondary big', onclick: showHowTo }, t('howto'))),
-      h('button', { class: 'btn ghost', onclick: () => { V = 'join'; render(); } }, t('have_code')))));
+      h('button', { class: 'join-link', onclick: () => { V = 'join'; render(); } }, t('have_code'))),
+    h('div', { class: 'home-steps', 'aria-label': 'How the game flows' },
+      h('span', null, '01 · ' + t('s_prompt')), h('b', null, '→'), h('span', null, '02 · ' + t('s_image')), h('b', null, '→'), h('span', null, '03 · ' + t('s_guess')))));
 }
 function setupView() {
   const set = (patch) => { cfg = Object.assign(cfg, patch); cfg.rounds = Math.max(3, Math.min(cfg.rounds, cfg.players)); LS.set('pw_cfg', cfg); render(); };
   mount(h('main', { class: 'screen mid' },
-    h('div', { class: 'card col', style: 'width:min(32em,100%)' },
+    h('div', { class: 'card col setup-card' },
+      h('span', { class: 'eyebrow center' }, t('setup_kicker')),
       h('h2', { class: 'center' }, t('setup')),
       stepper(t('players'), cfg.players, 3, 12, (v) => set({ players: v })),
       stepper(t('rounds'), cfg.rounds, 3, cfg.players, (v) => set({ rounds: v })),
@@ -375,12 +390,13 @@ function lobbyView() {
   const n = S.players.length;
   const set = (patch) => { const c = Object.assign({ players: S.expected, rounds: S.rounds, timer: S.timerOn }, patch); c.rounds = Math.max(3, Math.min(c.rounds, c.players)); cfg = c; LS.set('pw_cfg', cfg); send(Object.assign({ t: 'config' }, c)); };
   mount(h('main', { class: 'screen' },
-    h('div', { class: 'row hdr' }, h('h2', null, t('lobby')), h('span', { class: 'grow' }), logo('sm')),
+    h('div', { class: 'row hdr' }, h('div', { class: 'col title-stack' }, h('span', { class: 'eyebrow' }, t('players_joined')), h('h2', null, t('lobby'))), h('span', { class: 'grow' }), logo('sm')),
     h('div', { class: 'lobby-grid' },
       h('div', { class: 'col', style: 'align-items:flex-start' },
         h('span', { class: 'muted small' }, t('room_code')),
         h('button', { class: 'roomcode', 'aria-label': t('room_code') + ' ' + S.code, onclick: () => copyText(S.code) }, S.code, h('small', null, '⧉')),
-        h('p', null, t('join_at', { url: shown })),
+        h('p', { class: 'lobby-instruction' }, t('join_at', { url: shown })),
+        h('span', { class: 'small muted' }, t('lobby_hint')),
         h('div', { class: 'row' }, h('div', { class: 'qr' }, h('img', { src: apiUrl('qr.svg?u=' + encodeURIComponent(joinUrl)), alt: 'QR' })), h('span', { class: 'muted small' }, t('scan'))),
         h('div', { class: 'col', style: 'width:min(24em,100%)' },
           stepper(t('players'), S.expected, Math.max(3, n), 12, (v) => set({ players: v })),
@@ -399,6 +415,7 @@ function roundView() {
   const type = S.round === 0 ? 'prompt' : S.round % 2 ? 'image' : 'guess';
   const done = S.players.filter((p) => p.done).length;
   mount(h('main', { class: 'screen center', style: 'align-items:center;text-align:center' },
+    h('span', { class: 'eyebrow' }, t('round_kicker')),
     h('h2', null, t('round_of', { r: S.round + 1, R: S.rounds })),
     timerPill(),
     h('p', { style: 'max-width:30em' }, t('i_' + type)),
@@ -424,8 +441,8 @@ function drawReveal(opts = {}) {
   }
   const dots = h('span', { class: 'dots' }, S.chains.map((_, i) => h('i', { class: i === rv.c ? 'on' : '' })));
   const car = h('div', { class: 'carousel', 'aria-live': 'polite' }, cards);
-  mount(h('main', { class: 'screen' },
-    h('div', { class: 'row hdr' }, h('h2', null, t('chain_of', { c: rv.c + 1, C })), dots, h('span', { class: 'grow' }), h('span', { class: 'muted' }, t('started_by', { name: chain.owner }))),
+  mount(h('main', { class: 'screen reveal-screen' },
+    h('div', { class: 'row hdr' }, h('div', { class: 'title-stack' }, h('span', { class: 'eyebrow' }, t('reveal_kicker')), h('h2', null, t('chain_of', { c: rv.c + 1, C }))), dots, h('span', { class: 'grow' }), h('span', { class: 'muted' }, t('started_by', { name: chain.owner }))),
     car,
     h('div', { class: 'row center' },
       h('button', { class: 'btn secondary', disabled: rv.busy || (rv.c === 0 && rv.s === 0), onclick: revealPrev }, '◀ ' + t('prev_step')),
@@ -464,7 +481,7 @@ function resultsView() {
   const drift = S.score && S.score.drift;
   const medal = ['🥇', '🥈', '🥉'];
   mount(h('main', { class: 'screen' },
-    h('div', { class: 'row hdr' }, h('h2', null, '🏆 ' + t('results')), h('span', { class: 'grow' }), logo('sm')),
+    h('div', { class: 'row hdr' }, h('div', { class: 'title-stack' }, h('span', { class: 'eyebrow' }, t('results_kicker')), h('h2', null, '🏆 ' + t('results'))), h('span', { class: 'grow' }), logo('sm')),
     h('div', { class: 'results-grid' },
       h('div', { class: 'board' }, board.map((p, i) => h('div', { class: 'rowp' }, h('span', { class: 'rank' }, medal[i] || String(i + 1)), avatar(p.hue), p.name, h('span', { class: 'pts' }, t('pts', { n: p.pts }))))),
       h('div', { class: 'col' },
@@ -509,13 +526,13 @@ function taskView() {
     const field = h(isPrompt ? 'textarea' : 'input', { type: isPrompt ? null : 'text', value: draft[key], maxlength: String(MAX_TEXT), placeholder: isPrompt ? t('prompt_ph') : t('guess_ph'), 'aria-label': isPrompt ? t('write_prompt') : t('guess_ph'), autocomplete: 'off',
       oninput: (e) => { draft[key] = e.target.value; cnt.replaceChildren(counter(draft[key])); btn.disabled = !draft[key].trim() || draft.busy; } });
     const body = [];
-    if (isPrompt) body.push(h('h2', null, t('write_prompt')), field, cnt,
+    if (isPrompt) body.push(h('h2', null, t('write_prompt')), h('p', { class: 'task-hint' }, t('step_prompt_hint')), field, cnt,
       h('button', { class: 'btn secondary block', onclick: () => { const s = t('sugg'); field.value = draft.text = s[Math.floor(Math.random() * s.length)]; field.dispatchEvent(new Event('input')); } }, '🎲 ' + t('surprise')));
     else {
-      body.push(h('h2', null, t('guess_title')));
+      body.push(h('h2', null, t('guess_title')), h('p', { class: 'task-hint' }, t('step_guess_hint')));
       body.push(task.input && task.input.img ? h('img', { class: 'guessimg', src: apiUrl(task.input.img), alt: '' }) : h('div', { class: 'card center muted' }, t('no_image')), field, cnt);
     }
-    mount(h('main', { class: 'screen top' }, head, h('div', { class: 'col grow' }, body), btn));
+    mount(h('main', { class: 'screen top task-screen' }, head, h('div', { class: 'col grow task-panel' }, body), btn));
     return;
   }
 
