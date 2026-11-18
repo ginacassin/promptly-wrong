@@ -1,0 +1,17 @@
+{
+  "name": "promptly-wrong",
+  "version": "1.0.0",
+  "description": "Telephone game played with AI image prompts. Jackbox-style: TV host + phones.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/sim.js"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
