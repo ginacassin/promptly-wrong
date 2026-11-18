@@ -19,7 +19,7 @@ const I18N = {
     step_prompt_hint: 'Start with a wonderfully specific idea.', step_guess_hint: 'You only get the picture. Trust your instincts.',
     press_to_copy: 'Tap to copy', reveal_keys: 'Arrow keys or Space to reveal', progress_label: 'Player progress', preview_mode: 'Preview mode: start the game server to use rooms and multiplayer.',
     copied_room: 'Room code copied', players_ready: '{n} players joined', connected: 'Connected', disconnected: 'Reconnecting',
-    tagline: 'The AI telephone game where prompts go hilariously wrong.', use_prompt: 'Use this prompt:', host_sets: 'The host sets up the game', timer_on: 'Timer on', timer_off: 'No timer', n_rounds: '{n} rounds', cancel_room: 'Cancel room', end_game: 'End game', confirm_cancel: 'Cancel this room? Everyone will be sent back to the start.', confirm_end: 'End the game now? Everyone will be sent back to the start.', yes_cancel: 'Yes, cancel it', yes_end: 'Yes, end it', keep_room: 'Keep the room', keep_playing: 'Keep playing', e_room_closed: 'The host closed the room.', room_cancelled: 'Room cancelled.', more_seats: '+{n} more seats', empty_seat: 'Waiting for a player…',
+    tagline: 'The AI telephone game where prompts go hilariously wrong.', use_prompt: 'Use this prompt:', host_sets: 'The host sets up the game', wrap: 'That’s a wrap!', wrap_sub: 'Here’s how every chain went hilariously wrong.', download: 'Download souvenir (PDF)', downloading: 'Preparing your souvenir…', downloaded: 'Souvenir downloaded!', e_pdf: 'Couldn’t create the PDF. Try again.', t_text: 'Writing time', t_image: 'Image time', timer_vals: 'Writing {a} · Image {b}', timer_on: 'Timer on', timer_off: 'No timer', n_rounds: '{n} rounds', cancel_room: 'Cancel room', end_game: 'End game', confirm_cancel: 'Cancel this room? Everyone will be sent back to the start.', confirm_end: 'End the game now? Everyone will be sent back to the start.', yes_cancel: 'Yes, cancel it', yes_end: 'Yes, end it', keep_room: 'Keep the room', keep_playing: 'Keep playing', e_room_closed: 'The host closed the room.', room_cancelled: 'Room cancelled.', more_seats: '+{n} more seats', empty_seat: 'Waiting for a player…',
     play: 'Play', howto: 'How to play', have_code: 'I have a room code', close: 'Close', back: 'Back',
     how1: '**Everyone joins on their phone** and **writes a prompt**.',
     how2: "You get someone else's prompt: **paste it into your AI image generator** and **upload the picture**.",
@@ -37,7 +37,7 @@ const I18N = {
     i_guess: 'This round: guess the prompt that made the image.',
     chain_of: 'Chain {c} of {C}', started_by: 'Started by {name}',
     s_prompt: 'Original prompt', s_image: 'Generated image', s_guess: 'Guess',
-    by: 'by {name}', next_step: 'Next step', prev_step: 'Back', next_chain: 'Next chain', see_results: 'See results',
+    by: 'by {name}', next_step: 'Next step', prev_step: 'Back', next_chain: 'Next chain', see_results: 'Wrap it up',
     no_image: 'No image (skipped)', no_text: '(no answer)',
     results: 'Results!', pts: '{n} pts', drift: 'The prompts drifted an average of {n}% before going completely wrong!',
     play_again: 'Play Again', new_game: 'New Game', review: 'Review chains',
@@ -51,7 +51,7 @@ const I18N = {
     all_set: 'All set!', waiting_others: 'Waiting for the other players…',
     look_tv: 'Look at the big screen!', look_tv_sub: 'The reveal is starting…',
     game_over: 'Game Over!', hilarious: 'The chains were hilariously wrong!', thanks: 'Thanks for playing!',
-    waiting_host: 'Waiting for the host to start again…', your_pts: 'You scored {n} pts', all_chains: 'See all chains', hide_chains: 'Hide chains',
+    waiting_host: 'Waiting for the host to start again…', all_chains: 'See all chains', hide_chains: 'Hide chains',
     skipped_in: "The previous player didn't send anything.",
     connecting: 'Connecting…', offline: 'Connection lost. Reconnecting…',
     e_no_room: 'Room not found. Check the code.', e_started: 'That game has already started.', e_full: 'The room is full.',
@@ -67,7 +67,7 @@ const I18N = {
     step_prompt_hint: 'Empieza con una idea maravillosamente concreta.', step_guess_hint: 'Solo tienes la imagen. Déjate llevar.',
     press_to_copy: 'Pulsa para copiar', reveal_keys: 'Flechas o Espacio para revelar', progress_label: 'Progreso de jugadores', preview_mode: 'Modo de vista previa: inicia el servidor para usar las salas y el multijugador.',
     copied_room: 'Código de sala copiado', players_ready: '{n} jugadores dentro', connected: 'Conectado', disconnected: 'Reconectando',
-    tagline: 'El teléfono roto con IA donde los prompts se tuercen de lo lindo.', use_prompt: 'Usa este prompt:', host_sets: 'El anfitrión configura la partida', timer_on: 'Con temporizador', timer_off: 'Sin temporizador', n_rounds: '{n} rondas', cancel_room: 'Cancelar sala', end_game: 'Terminar partida', confirm_cancel: '¿Cancelar esta sala? Todos volverán al inicio.', confirm_end: '¿Terminar la partida ahora? Todos volverán al inicio.', yes_cancel: 'Sí, cancelarla', yes_end: 'Sí, terminarla', keep_room: 'Mantener la sala', keep_playing: 'Seguir jugando', e_room_closed: 'El anfitrión ha cerrado la sala.', room_cancelled: 'Sala cancelada.', more_seats: '+{n} plazas más', empty_seat: 'Esperando jugador…',
+    tagline: 'El teléfono roto con IA donde los prompts se tuercen de lo lindo.', use_prompt: 'Usa este prompt:', host_sets: 'El anfitrión configura la partida', wrap: '¡Y hasta aquí!', wrap_sub: 'Así se torció cada cadena de lo lindo.', download: 'Descargar recuerdo (PDF)', downloading: 'Preparando tu recuerdo…', downloaded: '¡Recuerdo descargado!', e_pdf: 'No se pudo crear el PDF. Inténtalo de nuevo.', t_text: 'Tiempo para escribir', t_image: 'Tiempo para la imagen', timer_vals: 'Escribir {a} · Imagen {b}', timer_on: 'Con temporizador', timer_off: 'Sin temporizador', n_rounds: '{n} rondas', cancel_room: 'Cancelar sala', end_game: 'Terminar partida', confirm_cancel: '¿Cancelar esta sala? Todos volverán al inicio.', confirm_end: '¿Terminar la partida ahora? Todos volverán al inicio.', yes_cancel: 'Sí, cancelarla', yes_end: 'Sí, terminarla', keep_room: 'Mantener la sala', keep_playing: 'Seguir jugando', e_room_closed: 'El anfitrión ha cerrado la sala.', room_cancelled: 'Sala cancelada.', more_seats: '+{n} plazas más', empty_seat: 'Esperando jugador…',
     play: 'Jugar', howto: 'Cómo jugar', have_code: 'Tengo un código de sala', close: 'Cerrar', back: 'Volver',
     how1: '**Todos entran desde el móvil** y **escriben un prompt**.',
     how2: 'Recibes el prompt de otra persona: **pégalo en tu generador de imágenes con IA** y **sube la imagen**.',
@@ -85,7 +85,7 @@ const I18N = {
     i_guess: 'Esta ronda: adivina el prompt que creó la imagen.',
     chain_of: 'Cadena {c} de {C}', started_by: 'Empezó {name}',
     s_prompt: 'Prompt original', s_image: 'Imagen generada', s_guess: 'Adivinanza',
-    by: 'de {name}', next_step: 'Siguiente paso', prev_step: 'Atrás', next_chain: 'Siguiente cadena', see_results: 'Ver resultados',
+    by: 'de {name}', next_step: 'Siguiente paso', prev_step: 'Atrás', next_chain: 'Siguiente cadena', see_results: 'Ver el final',
     no_image: 'Sin imagen (omitida)', no_text: '(sin respuesta)',
     results: '¡Resultados!', pts: '{n} pts', drift: '¡Los prompts se desviaron un {n}% de media antes de torcerse del todo!',
     play_again: 'Jugar otra vez', new_game: 'Nueva partida', review: 'Repasar cadenas',
@@ -99,7 +99,7 @@ const I18N = {
     all_set: '¡Todo listo!', waiting_others: 'Esperando a los demás jugadores…',
     look_tv: '¡Mira la pantalla grande!', look_tv_sub: 'Empieza la revelación…',
     game_over: '¡Fin de la partida!', hilarious: '¡Las cadenas se torcieron a lo grande!', thanks: '¡Gracias por jugar!',
-    waiting_host: 'Esperando a que el anfitrión empiece otra vez…', your_pts: 'Has conseguido {n} pts', all_chains: 'Ver todas las cadenas', hide_chains: 'Ocultar cadenas',
+    waiting_host: 'Esperando a que el anfitrión empiece otra vez…', all_chains: 'Ver todas las cadenas', hide_chains: 'Ocultar cadenas',
     skipped_in: 'El jugador anterior no envió nada.',
     connecting: 'Conectando…', offline: 'Conexión perdida. Reconectando…',
     e_no_room: 'Sala no encontrada. Revisa el código.', e_started: 'Esa partida ya ha empezado.', e_full: 'La sala está llena.',
@@ -230,7 +230,10 @@ const urlCode = (new URLSearchParams(location.search).get('r') || '').toUpperCas
 let hostSess = LS.get('pw_host');
 let playerSess = LS.get('pw_player');
 const draft = { code: urlCode, name: (playerSess && playerSess.name) || '', text: '', guess: '', img: null, busy: false };
-let cfg = Object.assign({ players: 8, rounds: 3, timer: true }, LS.get('pw_cfg') || {});
+let cfg = Object.assign({ players: 8, rounds: 3, timer: true, tText: 60, tImage: 150 }, LS.get('pw_cfg') || {});
+const T_TEXT = { min: 15, max: 600, step: 15 }, T_IMAGE = { min: 30, max: 1200, step: 30 };
+const clampT = (v, r) => Math.max(r.min, Math.min(r.max, v));
+const fmtS = (sec) => Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
 let rv = null;           // reveal cursor {c, s, busy}
 const MAXP = () => (S && S.maxPlayers) || 30;
 const qrCache = new Map();
@@ -342,7 +345,7 @@ const holdStop = () => { clearTimeout(holdT); clearInterval(holdT); holdT = null
 ['pointerup', 'pointercancel', 'blur'].forEach((ev) => window.addEventListener(ev, holdStop));
 document.addEventListener('visibilitychange', holdStop);
 /** Stepper: tap to change by 1, press and hold to repeat. onDelta(±1) returns false when it can't move further. */
-function stepper(label, val, min, max, onDelta) {
+function stepper(label, val, min, max, onDelta, shown) {
   const btn = (d, cls, aria, dis) => h('button', { 'aria-label': `${label} ${aria}`, disabled: dis,
     onpointerdown: (e) => {
       if (e.button > 0) return;
@@ -356,7 +359,7 @@ function stepper(label, val, min, max, onDelta) {
     h('span', null, label),
     h('span', { class: 'ctl' },
       btn(-1, 'minus', '−', val <= min),
-      h('span', { class: 'val', 'aria-live': 'polite' }, String(val)),
+      h('span', { class: 'val' + (shown ? ' time' : ''), 'aria-live': 'polite' }, shown || String(val)),
       btn(1, 'plus', '+', val >= max)));
 }
 function toggle(label, on, onChange) {
@@ -440,11 +443,18 @@ function landingView() {
       h('button', { class: 'btn secondary big', onclick: showHowTo }, t('howto'))),
     h('button', { class: 'btn ghost', onclick: () => { V = 'join'; render(); } }, t('have_code'))));
 }
+/** Writing-time and image-time steppers (shown when the timer is on). */
+function timeSteppers(tText, tImage, onDelta) {
+  return h('div', { class: 'time-steppers' },
+    stepper(t('t_text'), tText, T_TEXT.min, T_TEXT.max, (d) => onDelta('tText', d * T_TEXT.step), fmtS(tText)),
+    stepper(t('t_image'), tImage, T_IMAGE.min, T_IMAGE.max, (d) => onDelta('tImage', d * T_IMAGE.step), fmtS(tImage)));
+}
 function setupView() {
   const set = (patch) => {
-    const before = cfg.players + ':' + cfg.rounds + ':' + cfg.timer;
-    cfg = Object.assign(cfg, patch); cfg.rounds = Math.max(3, Math.min(cfg.rounds, cfg.players)); LS.set('pw_cfg', cfg); render();
-    return before !== cfg.players + ':' + cfg.rounds + ':' + cfg.timer;
+    const before = JSON.stringify(cfg);
+    cfg = Object.assign(cfg, patch); cfg.rounds = Math.max(3, Math.min(cfg.rounds, cfg.players));
+    cfg.tText = clampT(cfg.tText, T_TEXT); cfg.tImage = clampT(cfg.tImage, T_IMAGE); LS.set('pw_cfg', cfg); render();
+    return before !== JSON.stringify(cfg);
   };
   mount('setup', h('main', { class: 'screen mid' },
     h('div', { class: 'card setup-card' },
@@ -452,8 +462,9 @@ function setupView() {
       stepper(t('players'), cfg.players, 3, MAXP(), (d) => set({ players: Math.max(3, Math.min(MAXP(), cfg.players + d)) })),
       stepper(t('rounds'), cfg.rounds, 3, cfg.players, (d) => set({ rounds: Math.max(3, Math.min(cfg.players, cfg.rounds + d)) })),
       toggle(t('timer'), cfg.timer, (v) => set({ timer: v })),
+      cfg.timer ? timeSteppers(cfg.tText, cfg.tImage, (k, d) => set({ [k]: cfg[k] + d })) : null,
       h('p', { class: 'hint' }, t('rounds_hint')),
-      h('button', { class: 'btn primary big block', onclick: act({ t: 'host_create', players: cfg.players, rounds: cfg.rounds, timer: cfg.timer }) }, t('create_room')),
+      h('button', { class: 'btn primary big block', onclick: act({ t: 'host_create', players: cfg.players, rounds: cfg.rounds, timer: cfg.timer, tText: cfg.tText, tImage: cfg.tImage }) }, t('create_room')),
       h('button', { class: 'btn ghost block', onclick: () => { V = 'landing'; render(); } }, t('back')))));
 }
 function joinView() {
@@ -486,11 +497,12 @@ function lobbyView() {
   const shown = location.host + BASE.replace(/\/$/, '');
   const n = S.players.length;
   const set = (patch) => {
-    const c = Object.assign({ players: S.expected, rounds: S.rounds, timer: S.timerOn }, patch);
+    const c = Object.assign({ players: S.expected, rounds: S.rounds, timer: S.timerOn, tText: S.tText, tImage: S.tImage }, patch);
     c.players = Math.max(Math.max(3, n), Math.min(MAXP(), c.players)); c.rounds = Math.max(3, Math.min(c.rounds, c.players));
+    c.tText = clampT(c.tText, T_TEXT); c.tImage = clampT(c.tImage, T_IMAGE);
     // optimistic: update locally right away, server confirms
-    if (c.players === S.expected && c.rounds === S.rounds && c.timer === S.timerOn) return false;
-    S.expected = c.players; S.rounds = c.rounds; S.timerOn = c.timer; cfg = c; LS.set('pw_cfg', cfg); send(Object.assign({ t: 'config' }, c)); render();
+    if (c.players === S.expected && c.rounds === S.rounds && c.timer === S.timerOn && c.tText === S.tText && c.tImage === S.tImage) return false;
+    Object.assign(S, { expected: c.players, rounds: c.rounds, timerOn: c.timer, tText: c.tText, tImage: c.tImage }); cfg = c; LS.set('pw_cfg', cfg); send(Object.assign({ t: 'config' }, c)); render();
     return true;
   };
   const rows = S.players.map((p) => h('div', { class: 'prow' + (p.connected ? '' : ' off'), 'data-k': p.id }, avatar(p.hue, p.connected ? '' : 'off'), h('span', { class: 'n' }, p.name), ic('check'),
@@ -509,7 +521,8 @@ function lobbyView() {
         h('div', { class: 'settings' },
           stepper(t('players'), S.expected, Math.max(3, n), MAXP(), (d) => set({ players: S.expected + d })),
           stepper(t('rounds'), S.rounds, 3, S.expected, (d) => set({ rounds: S.rounds + d })),
-          toggle(t('timer'), S.timerOn, (v) => set({ timer: v })))),
+          toggle(t('timer'), S.timerOn, (v) => set({ timer: v })),
+          S.timerOn ? timeSteppers(S.tText, S.tImage, (k, d) => set({ [k]: S[k] + d })) : null)),
       h('div', { class: 'players-panel' },
         h('h3', { 'aria-live': 'polite' }, t('n_players', { n, max: S.expected })),
         h('div', { class: 'plist' + (n > 16 ? ' three' : n > 8 ? ' two' : '') }, rows),
@@ -583,28 +596,35 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') revealPrev();
 });
 
-const medal = (i) => h('span', { class: 'medal ' + (i < 3 ? 'm' + (i + 1) : 'mx') }, String(i + 1));
-function boardRows(board) {
-  return board.map((p, i) => h('div', { class: 'rowp' }, medal(i), avatar(p.hue), h('span', null, p.name), h('span', { class: 'pts' }, t('pts', { n: p.pts }))));
+/** Download the souvenir PDF (fetch → blob so we can show progress and errors). */
+async function downloadPdf(e) {
+  const btn = e && e.currentTarget;
+  const code = S && S.code;
+  if (!code) return;
+  pending(btn);
+  const label = btn && btn.querySelector('.lbl');
+  if (label) label.textContent = t('downloading');
+  try {
+    const r = await fetch(apiUrl(`export/${code}.pdf?lang=${lang}`));
+    if (!r.ok) throw new Error(r.status);
+    const blob = await r.blob();
+    const a = h('a', { href: URL.createObjectURL(blob), download: `promptly-wrong-${code}.pdf` });
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+    toast(t('downloaded'));
+  } catch { toast(t('e_pdf'), 'error'); }
+  if (btn) { btn.classList.remove('loading'); btn.disabled = false; btn.removeAttribute('aria-busy'); if (label) label.textContent = t('download'); }
 }
-function resultsView() {
-  const board = (S.score && S.score.board) || [];
-  const drift = S.score && S.score.drift;
-  mount('results', h('main', { class: 'screen results' },
-    h('div', { class: 'title-center' }, h('h2', null, ic('crown'), t('results'), ic('crown'))),
-    h('div', { class: 'results-grid' },
-      h('div', { class: 'board' }, boardRows(board)),
-      h('div', { class: 'col' },
-        drift != null ? h('div', { class: 'statcard' }, h('b', null, drift + '%'), h('span', null, t('drift', { n: drift }))) : null,
-        h('div', { class: 'btns' },
-          h('button', { class: 'btn primary big', onclick: act({ t: 'again' }) }, t('play_again')),
-          h('button', { class: 'btn outline big', onclick: (e) => { if (send({ t: 'close' })) pending(e.currentTarget); else { resetSession('host'); render(); } } }, t('new_game'))),
-        h('button', { class: 'btn ghost', onclick: () => { V2 = 'review'; render(); } }, t('review'))))));
-}
-function reviewView() {
-  mount('review', h('main', { class: 'screen' },
-    h('div', { class: 'hdr' }, h('h2', null, t('review')), h('span', { class: 'grow' }), h('button', { class: 'btn secondary', onclick: () => { V2 = null; render(); } }, ic('back'), t('back'))),
-    h('div', { class: 'scroll-y' }, S.chains.map((c, i) => h('div', { class: 'chain-block' }, h('h3', null, t('chain_of', { c: i + 1, C: S.chains.length }) + ' · ' + t('started_by', { name: c.owner })), chainStrip(c))))));
+const pdfBtn = (cls = '') => h('button', { class: 'btn primary big ' + cls, onclick: downloadPdf }, ic('download'), h('span', { class: 'lbl' }, t('download')));
+
+function endView() {
+  mount('end', h('main', { class: 'screen wrapup' },
+    h('div', { class: 'title-center' }, h('h2', null, ic('crown'), t('wrap'), ic('crown')), h('p', { class: 'muted' }, t('wrap_sub'))),
+    h('div', { class: 'wrap-actions' },
+      pdfBtn(),
+      h('button', { class: 'btn secondary big', onclick: act({ t: 'again' }) }, t('play_again')),
+      h('button', { class: 'btn outline big', onclick: (e) => { if (send({ t: 'close' })) pending(e.currentTarget); else { resetSession('host'); render(); } } }, t('new_game'))),
+    h('div', { class: 'scroll-y' }, S.chains.map((c, i) => h('div', { class: 'chain-block', 'data-k': 'c' + i }, h('h3', null, t('chain_of', { c: i + 1, C: S.chains.length }) + ' · ' + t('started_by', { name: c.owner })), chainStrip(c))))));
 }
 
 // ======================================================= views: player
@@ -693,7 +713,7 @@ function playerView() {
         h('div', { class: 'gi-row' },
           h('span', null, ic('user'), t('n_players', { n: S.players.length, max: S.expected })),
           h('span', null, t('n_rounds', { n: S.rounds })),
-          h('span', null, ic('clock'), S.timerOn ? t('timer_on') : t('timer_off')))) : null));
+          h('span', null, ic('clock'), S.timerOn ? t('timer_vals', { a: fmtS(S.tText || 60), b: fmtS(S.tImage || 150) }) : t('timer_off')))) : null));
   } else if (ph === 'round') {
     mount('p-done'+S.round, h('main', { class: 'screen mid' },
       h('div', { class: 'milestone' }, confetti(6), h('div', { class: 'bigcheck', role: 'img', 'aria-label': t('done') })),
@@ -703,15 +723,12 @@ function playerView() {
       h('div', { class: 'milestone' }, h('div', { class: 'eyes', 'aria-hidden': 'true' }, h('i'), h('i'))),
       h('h2', null, t('look_tv')), h('p', { class: 'muted' }, t('look_tv_sub'))));
   } else if (ph === 'end') {
-    const board = (S.score && S.score.board) || [];
-    const me = board.find((p) => p.name === S.me.name);
     mount('p-end', h('main', { class: 'screen mid' },
       h('div', { class: 'milestone' }, confetti(6), h('div', { class: 'trophy', role: 'img', 'aria-label': t('game_over') }, h('span', { class: 'h l' }), h('span', { class: 'h r' }), h('span', { class: 'cup' }), h('span', { class: 'stem' }), h('span', { class: 'base' }))),
       h('h2', null, t('game_over')), h('p', null, t('hilarious')),
-      me ? h('span', { class: 'pill me-pill' }, avatar(S.me.hue), t('your_pts', { n: me.pts })) : null,
-      h('div', { class: 'board end-board' }, boardRows(board)),
+      pdfBtn('block'),
       h('button', { class: 'btn secondary block', onclick: () => { V2 = V2 ? null : 'chains'; render(); } }, V2 ? t('hide_chains') : t('all_chains')),
-      V2 ? h('div', { class: 'col', style: 'width:100%;text-align:left' }, S.chains.map((c, i) => h('div', { class: 'chain-block' }, h('h3', null, t('chain_of', { c: i + 1, C: S.chains.length })), chainStrip(c)))) : null,
+      V2 ? h('div', { class: 'col', style: 'width:100%;text-align:left' }, S.chains.map((c, i) => h('div', { class: 'chain-block', 'data-k': 'c' + i }, h('h3', null, t('chain_of', { c: i + 1, C: S.chains.length })), chainStrip(c)))) : null,
       h('p', { class: 'muted small' }, t('thanks')), h('p', { class: 'muted small' }, t('waiting_host'))));
   }
 }
@@ -725,7 +742,7 @@ function render() {
     if (S.phase === 'lobby') return lobbyView();
     if (S.phase === 'round') return roundView();
     if (S.phase === 'reveal') return drawReveal({ enter: false });
-    if (S.phase === 'end') return V2 === 'review' ? reviewView() : resultsView();
+    if (S.phase === 'end') return endView();
   }
   if (role === 'player' && S && S.t === 'player_state') return playerView();
   if (role) return connectingView();

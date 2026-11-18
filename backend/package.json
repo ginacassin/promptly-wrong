@@ -10,9 +10,12 @@
     "test": "node test/sim.js"
   },
   "dependencies": {
+    "pdfkit": "^0.20.2",
     "qrcode": "^1.5.4",
     "redis": "^4.7.0",
     "ws": "^8.18.0"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

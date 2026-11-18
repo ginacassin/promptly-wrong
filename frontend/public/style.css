@@ -654,3 +654,26 @@ body.phone .splash { animation-name: driftPhone; }
 .lobby .join-text b { color: var(--color-text); }
 .lobby .join-text b.url { color: var(--color-info); }
 .lobby .join-text { font-weight: 500; color: #DCD7F5; }
+
+/* ---------- download icon (arrow into tray) ---------- */
+.ic-download::before { left: calc(50% - .06em); top: 0; width: .12em; height: .55em; background: currentColor; border-radius: .06em; }
+.ic-download::after { left: calc(50% - .22em); top: .26em; width: .44em; height: .44em; border: solid currentColor; border-width: 0 .12em .12em 0; transform: rotate(45deg) translate(-.08em, -.08em); border-radius: 0 0 .05em 0;
+  box-shadow: .26em .26em 0 -.2em transparent; }
+.ic-download { border-bottom: .12em solid currentColor; border-radius: 0 0 .1em .1em; height: .9em; }
+
+/* ---------- wrap-up (end) screen: no points, chains + souvenir ---------- */
+.wrapup { gap: .8em; }
+.wrapup .title-center h2 { display: inline-flex; align-items: center; gap: .4em; }
+.wrapup .title-center h2 .ic-crown { font-size: .7em; color: var(--color-warning); }
+.wrapup .title-center h2 .ic-crown:first-child { transform: rotate(-14deg); }
+.wrapup .title-center h2 .ic-crown:last-child { transform: rotate(14deg); }
+.wrap-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .6em; }
+.wrap-actions .btn { font-size: .9em; }
+body.phone .wrap-actions { flex-direction: column; }
+body.phone .wrap-actions .btn { width: 100%; }
+.wrapup .scroll-y { padding-right: .3em; }
+
+/* ---------- timer durations ---------- */
+.time-steppers { display: flex; flex-direction: column; gap: .5em; }
+.settings .time-steppers { flex-direction: row; flex-wrap: wrap; }
+.stepper .val.time { min-width: 2.6em; font-size: 1em; padding: 0 .35em; }

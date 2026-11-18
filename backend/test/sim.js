@@ -42,6 +42,7 @@ function client(port, wsPath = '/ws') {
 async function fullGame({ hostPort, playerPorts, N = 4, R = 3, label }) {
   const host = client(hostPort, '/api/ws'); // prefix-tolerant routing
   await host.open;
+  assert.equal((await fetch(`http://localhost:${hostPort}/api/export/ZZZZ.pdf`)).status, 404);
   host.send({ t: 'host_create', players: N + 1, rounds: R, timer: false });
   const code = (await host.until((m) => m.t === 'host_ok')).code;
   const ps = [];
@@ -65,6 +66,12 @@ async function fullGame({ hostPort, playerPorts, N = 4, R = 3, label }) {
   assert.equal(host.state.expected, exp0, 'player must not change settings');
   assert.equal(host.state.phase, 'lobby', 'player must not start the game');
   assert.equal(ps[1].state.expected, exp0, 'players see the settings');
+  host.send({ t: 'config', players: N + 1, rounds: R, timer: true, tText: 45, tImage: 5 });
+  const cfgd = await host.until((m) => m.t === 'host_state' && m.tText === 45);
+  assert.equal(cfgd.tImage, 30, 'image time clamps to its minimum');
+  await ps[2].until((m) => m.t === 'player_state' && m.tText === 45);
+  host.send({ t: 'config', players: N + 1, rounds: R, timer: false });
+  await host.until((m) => m.t === 'host_state' && m.timerOn === false);
 
   host.send({ t: 'start' });
   for (let r = 0; r < R; r++) {
@@ -92,8 +99,14 @@ async function fullGame({ hostPort, playerPorts, N = 4, R = 3, label }) {
   }
   host.send({ t: 'reveal_done' });
   const end = await host.until((m) => m.t === 'host_state' && m.phase === 'end');
-  assert.equal(end.score.board.length, N);
-  assert(end.score.board.every((p) => p.pts > 0), 'perfect guesses should score');
+  assert.equal(end.score, undefined, 'no points system');
+  for (const port of new Set([hostPort, ...playerPorts])) {
+    const pdf = await fetch(`http://localhost:${port}/api/export/${code}.pdf?lang=es`);
+    assert.equal(pdf.status, 200, 'pdf on port ' + port);
+    assert.equal(pdf.headers.get('content-type'), 'application/pdf');
+    const buf = Buffer.from(await pdf.arrayBuffer());
+    assert(buf.subarray(0, 5).toString() === '%PDF-' && buf.length > 20000, 'looks like a pdf');
+  }
   await ps[N - 1].until((m) => m.t === 'player_state' && m.phase === 'end' && m.chains.length === N);
 
   host.send({ t: 'again' });
@@ -157,9 +170,9 @@ async function redisTests() {
 
   await fullGame({ hostPort: 3911, playerPorts: [3911, 3912], label: 'host on A, players on A+B' });
 
-  // shared timer: prompt phase = 1.2s, image phase = 3s -> after ~2.3s we must be exactly in round 1
+  // shared timer with custom durations: writing 60s*0.02 = 1.2s, image 150s*0.02 = 3s -> after ~2.3s exactly round 1
   const host = client(3912); await host.open;
-  host.send({ t: 'host_create', players: 3, rounds: 3, timer: true });
+  host.send({ t: 'host_create', players: 3, rounds: 3, timer: true, tText: 60, tImage: 150 });
   const code = (await host.until((m) => m.t === 'host_ok')).code;
   const ps = [];
   for (let i = 0; i < 3; i++) {
@@ -172,6 +185,9 @@ async function redisTests() {
   assert.equal(host.state.round, 1, 'timer should advance exactly once across replicas');
   assert.equal(ps[0].state.round, 1);
   console.log('  ✓ timer fires once across replicas');
+  host.send({ t: 'config', players: 3, rounds: 3, timer: true, tText: 5, tImage: 9999 });
+  await sleep(200);
+  assert.equal(host.state.tText, 60, 'config ignored outside the lobby');
 
   // failover: kill replica B, a player that was on B reconnects to A with its token
   const tok = ps[1].msgs.find((m) => m.t === 'join_ok').token;

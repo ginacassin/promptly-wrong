@@ -11,7 +11,9 @@ const MIN_PLAYERS = 3;
 const MIN_ROUNDS = 3;
 const MAX_TEXT = 120;
 const SCALE = Number(process.env.DUR_SCALE || 1); // tests speed timers up
-const DUR = { prompt: 60 * SCALE, image: 150 * SCALE, guess: 60 * SCALE }; // seconds per phase when the timer is on
+// Timer defaults and limits (seconds). The host can change both in setup/lobby.
+const T_TEXT = { def: 60, min: 15, max: 600 };   // writing a prompt / a guess
+const T_IMAGE = { def: 150, min: 30, max: 1200 }; // generating + uploading an image
 
 const rid = (n = 8) => crypto.randomBytes(n).toString('hex').slice(0, n);
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
@@ -25,7 +27,7 @@ const cleanText = (s) => String(s || '').replace(/[\u0000-\u0008\u000b-\u001f]/g
 const outType = (r) => (r === 0 ? 'prompt' : r % 2 === 1 ? 'image' : 'guess');
 const chainOf = (room, p, r) => (((p - r) % room.N) + room.N) % room.N;
 
-function createRoom({ code, players, rounds, timer }) {
+function createRoom({ code, players, rounds, timer, tText, tImage }) {
   const expected = clamp(players, MIN_PLAYERS, MAX_PLAYERS);
   return {
     v: 1,
@@ -35,6 +37,8 @@ function createRoom({ code, players, rounds, timer }) {
     expected,
     rounds: Math.min(clamp(rounds, MIN_ROUNDS, MAX_PLAYERS), expected),
     timerOn: timer !== false,
+    tText: clamp(tText ?? T_TEXT.def, T_TEXT.min, T_TEXT.max),
+    tImage: clamp(tImage ?? T_IMAGE.def, T_IMAGE.min, T_IMAGE.max),
     deadline: null,
     players: [], // {id, name, token, online, conn}
     N: 0,
@@ -70,11 +74,13 @@ function disconnect(room, playerId, conn) {
   return true;
 }
 
-function configure(room, { players, rounds, timer }) {
+function configure(room, { players, rounds, timer, tText, tImage }) {
   if (room.phase !== 'lobby') return false;
   room.expected = clamp(players, Math.max(MIN_PLAYERS, room.players.length), MAX_PLAYERS);
   room.rounds = clamp(rounds, MIN_ROUNDS, MAX_PLAYERS);
   room.timerOn = timer !== false;
+  if (tText != null) room.tText = clamp(tText, T_TEXT.min, T_TEXT.max);
+  if (tImage != null) room.tImage = clamp(tImage, T_IMAGE.min, T_IMAGE.max);
   return true;
 }
 
@@ -88,7 +94,8 @@ function kick(room, id) {
 
 function startRound(room, now) {
   room.subs = [];
-  room.deadline = room.phase === 'round' && room.timerOn ? now + DUR[outType(room.round)] * 1000 : null;
+  const secs = outType(room.round) === 'image' ? room.tImage || T_IMAGE.def : room.tText || T_TEXT.def;
+  room.deadline = room.phase === 'round' && room.timerOn ? now + secs * SCALE * 1000 : null;
 }
 
 function start(room, now) {
@@ -159,53 +166,8 @@ function again(room) {
   return true;
 }
 
-// ---------------------------------------------------------------- scoring
-const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
-function lev(a, b) {
-  const m = a.length, n = b.length;
-  if (!m) return n;
-  if (!n) return m;
-  let prev = Array.from({ length: n + 1 }, (_, i) => i);
-  for (let i = 1; i <= m; i++) {
-    const cur = [i];
-    for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-    prev = cur;
-  }
-  return prev[n];
-}
-/** 0..1 similarity: word overlap + character edit distance, accent-insensitive. */
-function sim(a, b) {
-  a = norm(a);
-  b = norm(b);
-  if (!a || !b) return 0;
-  const A = new Set(a.split(' ')), B = new Set(b.split(' '));
-  let inter = 0;
-  for (const w of A) if (B.has(w)) inter++;
-  return 0.5 * (inter / (A.size + B.size - inter)) + 0.5 * (1 - lev(a, b) / Math.max(a.length, b.length));
-}
-
 const hueOf = (room, id) => Math.round((Math.max(room.players.findIndex((p) => p.id === id), 0) * 137.5) % 360);
 const nameOf = (room, id) => (room.players.find((p) => p.id === id) || {}).name || '?';
-
-function scoreboard(room) {
-  const pts = new Map(room.players.map((p) => [p.id, 0]));
-  const drifts = [];
-  for (const ch of room.chains) {
-    const st = ch.steps;
-    for (let i = 2; i < st.length; i++) {
-      if (st[i].type !== 'guess' || st[i].text == null || !st[i - 2] || st[i - 2].text == null) continue;
-      const v = Math.round(sim(st[i - 2].text, st[i].text) * 100);
-      pts.set(st[i].by, (pts.get(st[i].by) || 0) + v);
-      if (pts.has(st[i - 1].by)) pts.set(st[i - 1].by, pts.get(st[i - 1].by) + v); // image maker shares credit
-    }
-    const first = st[0] && st[0].text;
-    const lastText = [...st].reverse().find((s) => s.type !== 'image' && s.text != null);
-    if (first != null && lastText && st.length > 1) drifts.push(Math.round((1 - sim(first, lastText.text)) * 100));
-  }
-  const board = room.players.map((p) => ({ name: p.name, hue: hueOf(room, p.id), pts: pts.get(p.id) || 0 })).sort((a, b) => b.pts - a.pts);
-  const drift = drifts.length ? Math.round(drifts.reduce((a, b) => a + b, 0) / drifts.length) : null;
-  return { board, drift };
-}
 
 // ---------------------------------------------------------------- views (what clients receive)
 const imgUrl = (room, id) => (id ? `img/${room.code}/${id}` : null);
@@ -229,11 +191,12 @@ function hostView(room, now) {
     round: room.round,
     N: room.N,
     timerOn: room.timerOn,
+    tText: room.tText,
+    tImage: room.tImage,
     maxPlayers: MAX_PLAYERS,
     timeLeft: timeLeft(room, now),
     players: room.players.map((p) => ({ id: p.id, name: p.name, hue: hueOf(room, p.id), connected: !!p.online, done: done && room.subs.includes(p.id) })),
     chains: room.phase === 'reveal' || room.phase === 'end' ? serChains(room) : null,
-    score: room.phase === 'end' ? scoreboard(room) : null,
   };
 }
 
@@ -249,6 +212,8 @@ function playerView(room, playerId, now) {
     rounds: room.rounds,
     expected: room.expected,
     timerOn: room.timerOn,
+    tText: room.tText,
+    tImage: room.tImage,
     round: room.round,
     timeLeft: timeLeft(room, now),
     players: room.players.map((p) => ({ name: p.name, hue: hueOf(room, p.id), connected: !!p.online })),
@@ -263,16 +228,13 @@ function playerView(room, playerId, now) {
     st.task = task;
     st.done = room.subs.includes(me.id);
   }
-  if (room.phase === 'end') {
-    st.chains = serChains(room);
-    st.score = scoreboard(room);
-  }
+  if (room.phase === 'end') st.chains = serChains(room);
   return st;
 }
 
 module.exports = {
-  MAX_TEXT, MIN_PLAYERS, MAX_PLAYERS, DUR,
-  rid, newCode, outType, chainOf, sim,
+  MAX_TEXT, MIN_PLAYERS, MAX_PLAYERS, T_TEXT, T_IMAGE,
+  rid, newCode, outType, chainOf, nameOf, hueOf,
   createRoom, join, disconnect, configure, kick, start, submit, advance, timeUp, revealDone, again, expectedKind,
-  scoreboard, hostView, playerView,
+  hostView, playerView,
 };

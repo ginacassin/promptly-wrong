@@ -10,7 +10,7 @@ The AI telephone game where prompts go hilariously wrong. Jackbox-style: one sha
 5. The TV reveals every chain step by step. Leaderboard + "drift" stat at the end.
 
 Up to 30 players per room by default (`MAX_PLAYERS`). The host can cancel the room at any time; everyone is sent back to the start. Rounds are 3..players (nobody touches the same chain twice). Odd rounds end on a guess.
-**Scoring:** each guess scores 0-100 for closeness to the text that produced the image (word overlap + edit distance, accent-insensitive); the image maker shares the points.
+At the end there are no points: everyone sees all the chains and can **download a souvenir PDF** (`GET …/export/CODE.pdf?lang=en|es`) drawn in the game style. The host sets an optional timer with separate writing and image times.
 
 ## Architecture
 ```

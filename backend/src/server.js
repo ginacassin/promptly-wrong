@@ -17,6 +17,7 @@ const QRCode = require('qrcode');
 const G = require('./game');
 const { MemoryStore } = require('./store/memory');
 const { RedisStore } = require('./store/redis');
+const { buildSouvenir } = require('./pdf');
 
 const PORT = Number(process.env.PORT || 3000);
 const REDIS_URL = process.env.REDIS_URL || '';
@@ -91,6 +92,19 @@ async function main() {
         if (!img) { res.writeHead(404); return res.end(); }
         res.writeHead(200, { 'Content-Type': img.type, 'Cache-Control': 'private, max-age=21600, immutable' });
         return res.end(img.buf);
+      }
+
+      if ((m = /(?:^|\/)export\/([A-Za-z]{4})\.pdf$/.exec(p))) {
+        // Souvenir PDF of a finished game (available during the reveal and at the end)
+        const code = m[1].toUpperCase();
+        const room = await store.get(code);
+        if (!room || !['reveal', 'end'].includes(room.phase)) { res.writeHead(404, { 'Content-Type': 'text/plain' }); return res.end('Not found'); }
+        const lang = url.searchParams.get('lang') === 'es' ? 'es' : 'en';
+        const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim().replace(/[^\w.:-]/g, '');
+        const doc = await buildSouvenir(room, (id) => store.getImage(code, id), { lang, host });
+        res.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="promptly-wrong-${code}.pdf"`, 'Cache-Control': 'private, no-store' });
+        doc.pipe(res);
+        return;
       }
 
       if (/(^|\/)qr\.json$/.test(p)) {
@@ -175,7 +189,7 @@ async function main() {
       case 'host_create': {
         let room;
         for (let i = 0; i < 20; i++) {
-          room = G.createRoom({ code: G.newCode(), players: msg.players, rounds: msg.rounds, timer: msg.timer });
+          room = G.createRoom({ code: G.newCode(), players: msg.players, rounds: msg.rounds, timer: msg.timer, tText: msg.tText, tImage: msg.tImage });
           if (await store.create(room)) break;
           room = null;
         }
