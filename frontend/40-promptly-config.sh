@@ -6,6 +6,9 @@ set -e
 API_BASE="${API_BASE:-api/}"
 API_BASE=$(printf '%s' "$API_BASE" | tr -d '"\\<>')
 printf 'window.PW_CONFIG = { apiBase: "%s" };\n' "$API_BASE" > /usr/share/nginx/html/config.js
+# Cache-bust assets on every container start so browsers pick up new deploys.
+V=$(date +%s)
+sed -i "s/__V__/$V/g" /usr/share/nginx/html/index.html
 mkdir -p /etc/nginx/snippets
 if [ -n "$BACKEND_URL" ]; then
   cat > /etc/nginx/snippets/proxy.inc <<CONF
