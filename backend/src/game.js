@@ -15,6 +15,15 @@ const SCALE = Number(process.env.DUR_SCALE || 1); // tests speed timers up
 const T_TEXT = { def: 60, min: 15, max: 600 };   // writing a prompt / a guess
 const T_IMAGE = { def: 150, min: 30, max: 1200 }; // generating + uploading an image
 
+// Player avatars: 30 funny emoji. New players get a random unused one; players may pick any (repeats allowed).
+const EMOJIS = ['🐸', '🐙', '🦄', '🐔', '🦖', '🐧', '🦥', '🐌', '🦩', '🐷', '🐵', '🦀', '🐢', '🦉', '🦊', '🐱', '🐶', '🐳', '🦔', '🦆', '🐝', '🍕', '🌮', '🥑', '🍩', '👽', '🤖', '👻', '🤡', '🧀'];
+function pickEmoji(room) {
+  const used = new Set(room.players.map((p) => p.emoji));
+  const free = EMOJIS.filter((e) => !used.has(e));
+  const pool = free.length ? free : EMOJIS;
+  return pool[crypto.randomInt(pool.length)];
+}
+
 const rid = (n = 8) => crypto.randomBytes(n).toString('hex').slice(0, n);
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 const newCode = () => Array.from({ length: 4 }, () => CODE_CHARS[crypto.randomInt(CODE_CHARS.length)]).join('');
@@ -62,7 +71,7 @@ function join(room, { name, token, conn }) {
   const n = cleanName(name);
   if (!n) return { err: 'bad_name' };
   if (room.players.some((x) => x.name.toLowerCase() === n.toLowerCase())) return { err: 'name_taken' };
-  p = { id: rid(6), name: n, token: rid(16), online: true, conn };
+  p = { id: rid(6), name: n, token: rid(16), online: true, conn, emoji: pickEmoji(room) };
   room.players.push(p);
   return { player: p };
 }
@@ -71,6 +80,13 @@ function disconnect(room, playerId, conn) {
   const p = room.players.find((x) => x.id === playerId);
   if (!p || p.conn !== conn) return false; // a newer connection already took over
   p.online = false;
+  return true;
+}
+
+function setEmoji(room, playerId, emoji) {
+  const p = room.players.find((x) => x.id === playerId);
+  if (!p || !EMOJIS.includes(emoji) || p.emoji === emoji) return false;
+  p.emoji = emoji;
   return true;
 }
 
@@ -168,6 +184,7 @@ function again(room) {
 
 const hueOf = (room, id) => Math.round((Math.max(room.players.findIndex((p) => p.id === id), 0) * 137.5) % 360);
 const nameOf = (room, id) => (room.players.find((p) => p.id === id) || {}).name || '?';
+const emojiOf = (room, id) => (room.players.find((p) => p.id === id) || {}).emoji || null;
 
 // ---------------------------------------------------------------- views (what clients receive)
 const imgUrl = (room, id) => (id ? `img/${room.code}/${id}` : null);
@@ -175,7 +192,8 @@ const imgUrl = (room, id) => (id ? `img/${room.code}/${id}` : null);
 function serChains(room) {
   return room.chains.map((ch) => ({
     owner: nameOf(room, ch.owner),
-    steps: ch.steps.map((s) => ({ type: s.type, author: nameOf(room, s.by), hue: hueOf(room, s.by), text: s.text, img: imgUrl(room, s.img) })),
+    ownerEmoji: emojiOf(room, ch.owner),
+    steps: ch.steps.map((s) => ({ type: s.type, author: nameOf(room, s.by), hue: hueOf(room, s.by), emoji: emojiOf(room, s.by), text: s.text, img: imgUrl(room, s.img) })),
   }));
 }
 const timeLeft = (room, now) => (room.deadline ? Math.max(0, room.deadline - now) : null);
@@ -195,7 +213,7 @@ function hostView(room, now) {
     tImage: room.tImage,
     maxPlayers: MAX_PLAYERS,
     timeLeft: timeLeft(room, now),
-    players: room.players.map((p) => ({ id: p.id, name: p.name, hue: hueOf(room, p.id), connected: !!p.online, done: done && room.subs.includes(p.id) })),
+    players: room.players.map((p) => ({ id: p.id, name: p.name, hue: hueOf(room, p.id), emoji: p.emoji, connected: !!p.online, done: done && room.subs.includes(p.id) })),
     chains: room.phase === 'reveal' || room.phase === 'end' ? serChains(room) : null,
   };
 }
@@ -208,7 +226,8 @@ function playerView(room, playerId, now) {
     t: 'player_state',
     code: room.code,
     phase: room.phase,
-    me: { id: me.id, name: me.name, hue: hueOf(room, me.id) },
+    me: { id: me.id, name: me.name, hue: hueOf(room, me.id), emoji: me.emoji },
+    emojis: EMOJIS,
     rounds: room.rounds,
     expected: room.expected,
     timerOn: room.timerOn,
@@ -216,7 +235,7 @@ function playerView(room, playerId, now) {
     tImage: room.tImage,
     round: room.round,
     timeLeft: timeLeft(room, now),
-    players: room.players.map((p) => ({ name: p.name, hue: hueOf(room, p.id), connected: !!p.online })),
+    players: room.players.map((p) => ({ name: p.name, hue: hueOf(room, p.id), emoji: p.emoji, connected: !!p.online })),
   };
   if (room.phase === 'round') {
     const r = room.round;
@@ -233,8 +252,8 @@ function playerView(room, playerId, now) {
 }
 
 module.exports = {
-  MAX_TEXT, MIN_PLAYERS, MAX_PLAYERS, T_TEXT, T_IMAGE,
+  MAX_TEXT, MIN_PLAYERS, MAX_PLAYERS, T_TEXT, T_IMAGE, EMOJIS,
   rid, newCode, outType, chainOf, nameOf, hueOf,
-  createRoom, join, disconnect, configure, kick, start, submit, advance, timeUp, revealDone, again, expectedKind,
+  createRoom, join, setEmoji, disconnect, configure, kick, start, submit, advance, timeUp, revealDone, again, expectedKind,
   hostView, playerView,
 };

@@ -73,6 +73,13 @@ async function fullGame({ hostPort, playerPorts, N = 4, R = 3, label }) {
   host.send({ t: 'config', players: N + 1, rounds: R, timer: false });
   await host.until((m) => m.t === 'host_state' && m.timerOn === false);
 
+  // emoji: players can pick any from the set (repeats allowed), invalid ones are ignored
+  const taken = host.state.players[0].emoji;
+  ps[1].send({ t: 'emoji', emoji: taken });
+  await host.until((m) => m.t === 'host_state' && m.players[1].emoji === taken);
+  ps[2].send({ t: 'emoji', emoji: '💣' }); await sleep(150);
+  assert.notEqual(host.state.players[2].emoji, '💣');
+  assert.equal(ps[1].state.me.emoji, taken);
   host.send({ t: 'start' });
   for (let r = 0; r < R; r++) {
     for (const p of ps) await p.until((m) => m.t === 'player_state' && m.phase === 'round' && m.round === r && !m.done);
@@ -154,6 +161,8 @@ async function memoryTests() {
   big.send({ t: 'start' });
   await big.until((m) => m.t === 'host_state' && m.phase === 'round' && m.N === 20);
   console.log('  ✓ 20-player room');
+  const em = (await big.until((m) => m.t === 'host_state')).players.map((p) => p.emoji);
+  assert.equal(new Set(em).size, 20, 'random emoji are unique while unused ones remain');
 }
 
 async function redisTests() {

@@ -231,6 +231,11 @@ async function main() {
     if (!c) return;
 
     if (c.role === 'player') {
+      if (msg.t === 'emoji') {
+        const out = await mutate(c.code, (r) => G.setEmoji(r, c.playerId, String(msg.emoji || '')));
+        if (!out) send(ws, { t: 'error', code: 'no_room' });
+        return;
+      }
       if (msg.t !== 'submit') return;
       const room = await store.get(c.code);
       if (!room) return send(ws, { t: 'error', code: 'no_room' });

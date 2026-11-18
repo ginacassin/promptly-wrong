@@ -7,7 +7,19 @@
 const path = require('path');
 const PDFDocument = require('pdfkit');
 
+const fs = require('fs');
 const FONTS = path.join(__dirname, '..', 'assets', 'fonts');
+const EMOJI_DIR = path.join(__dirname, '..', 'assets', 'emoji');
+const emojiCache = new Map();
+/** PNG of an emoji (rendered from Noto Color Emoji), or null. */
+function emojiPng(e) {
+  if (!e) return null;
+  if (!emojiCache.has(e)) {
+    const f = path.join(EMOJI_DIR, [...e].map((c) => c.codePointAt(0)).filter((c) => c !== 0xfe0f).map((c) => c.toString(16)).join('-') + '.png');
+    emojiCache.set(e, fs.existsSync(f) ? fs.readFileSync(f) : null);
+  }
+  return emojiCache.get(e);
+}
 const C = {
   bg: '#0B0A1A', surface: '#181436', violet: '#2A1D5C', text: '#F4F3FF', muted: '#C9C3EC', ink: '#0B0A1A',
   pink: '#FF4FA3', lime: '#C8FF3D', cyan: '#49E6FF', yellow: '#FFD84D', guess: '#FFC2E0', red: '#FF3B5C',
@@ -122,10 +134,12 @@ function logo(doc, cx, top, size) {
   return top + size * 2.55;
 }
 
-function avatar(doc, cx, cy, r, hue) {
+function avatar(doc, cx, cy, r, hue, emoji) {
   const c = colorOf(hue), f = c % 4;
   doc.circle(cx, cy, r + 1.2).fill(C.ink);
   doc.circle(cx, cy, r).fill(AV[c]);
+  const png = emojiPng(emoji);
+  if (png) { const s = r * 1.5; doc.image(png, cx - s / 2, cy - s / 2, { width: s, height: s }); return; }
   doc.circle(cx - r * 0.3, cy - r * 0.38, r * 0.32).fillOpacity(0.35).fill('#FFFFFF').fillOpacity(1);
   doc.fillColor(C.ink).strokeColor(C.ink).lineWidth(r * 0.14).lineCap('round');
   if (f === 2) { // squint ><
@@ -210,6 +224,7 @@ async function buildSouvenir(room, getImage, { lang = 'en', host = '' } = {}) {
   const rnd = rng(room.code + room.chains.length);
   const name = (id) => clean((room.players.find((p) => p.id === id) || {}).name || '?');
   const hue = (id) => Math.round((Math.max(room.players.findIndex((p) => p.id === id), 0) * 137.5) % 360);
+  const emo = (id) => (room.players.find((p) => p.id === id) || {}).emoji;
   const stepName = (type) => t[type === 'prompt' ? 's_prompt' : type === 'image' ? 's_image' : 's_guess'];
 
   // preload images (JPEG/PNG only: what pdfkit can embed)
@@ -259,7 +274,7 @@ async function buildSouvenir(room, getImage, { lang = 'en', host = '' } = {}) {
   const n = room.players.length, per = Math.min(n, 10), r = n > 10 ? 13 : 16;
   room.players.forEach((p, i) => {
     const row = Math.floor(i / per), inRow = Math.min(per, n - row * per), col = i % per;
-    avatar(doc, W / 2 - ((inRow - 1) * (r * 2 + 10)) / 2 + col * (r * 2 + 10), y + row * (r * 2 + 10), r, hue(p.id));
+    avatar(doc, W / 2 - ((inRow - 1) * (r * 2 + 10)) / 2 + col * (r * 2 + 10), y + row * (r * 2 + 10), r, hue(p.id), emo(p.id));
   });
   stamp(doc, W - 130, H - 140, t.certified, C.pink, -14);
   star(doc, 95, H - 175, 22, C.yellow, true);
@@ -290,7 +305,7 @@ async function buildSouvenir(room, getImage, { lang = 'en', host = '' } = {}) {
       : `«${clean(first) || t.no_text}»`;
     doc.text(title, M, 64, { width: W - M * 2 - 40, lineGap: 1 });
     let yy = doc.y + 8;
-    avatar(doc, M + 10, yy + 9, 10, hue(ch.owner));
+    avatar(doc, M + 10, yy + 9, 10, hue(ch.owner), emo(ch.owner));
     doc.font('inter700').fontSize(11).fillColor(C.muted).text(fill(t.started, { name: name(ch.owner) }), M + 28, yy + 3);
     yy += 40;
     let prev = null;
@@ -311,7 +326,7 @@ async function buildSouvenir(room, getImage, { lang = 'en', host = '' } = {}) {
       const numCol = s.type === 'prompt' ? C.yellow : s.type === 'image' ? C.cyan : C.pink;
       doc.fillColor(numCol).text(num, x, yy, { continued: true }).fillColor(C.text).text(' ' + stepName(s.type));
       const lw = doc.font('inter800').fontSize(11).widthOfString(`${num} ${stepName(s.type)}`);
-      avatar(doc, x + lw + 16, yy + 6, 7.5, hue(s.by));
+      avatar(doc, x + lw + 16, yy + 6, 7.5, hue(s.by), emo(s.by));
       doc.font('inter700').fontSize(10).fillColor(C.muted).text(name(s.by), x + lw + 28, yy + 1);
       yy += 20;
       let h;
@@ -337,7 +352,7 @@ async function buildSouvenir(room, getImage, { lang = 'en', host = '' } = {}) {
     const col = cols === 2 ? i % 2 : 0, row = cols === 2 ? Math.floor(i / 2) : i;
     const x0 = cols === 2 ? W / 2 - colWd - 10 + col * (colWd + 20) : W / 2 - colWd / 2;
     const yv = cy + row * 34;
-    avatar(doc, x0 + 14, yv + 12, 12, hue(p.id));
+    avatar(doc, x0 + 14, yv + 12, 12, hue(p.id), emo(p.id));
     doc.font('rubik800').fontSize(17).fillColor(C.text).text(name(p.id), x0 + 36, yv + 2, { width: colWd - 40, lineBreak: false, ellipsis: true });
   });
   const rows = cols === 2 ? Math.ceil(room.players.length / 2) : room.players.length;

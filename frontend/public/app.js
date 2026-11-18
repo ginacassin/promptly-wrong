@@ -19,7 +19,7 @@ const I18N = {
     step_prompt_hint: 'Start with a wonderfully specific idea.', step_guess_hint: 'You only get the picture. Trust your instincts.',
     press_to_copy: 'Tap to copy', reveal_keys: 'Arrow keys or Space to reveal', progress_label: 'Player progress', preview_mode: 'Preview mode: start the game server to use rooms and multiplayer.',
     copied_room: 'Room code copied', players_ready: '{n} players joined', connected: 'Connected', disconnected: 'Reconnecting',
-    tagline: 'The AI telephone game where prompts go hilariously wrong.', use_prompt: 'Use this prompt:', host_sets: 'The host sets up the game', wrap: 'That’s a wrap!', wrap_sub: 'Here’s how every chain went hilariously wrong.', download: 'Download souvenir (PDF)', downloading: 'Preparing your souvenir…', downloaded: 'Souvenir downloaded!', e_pdf: 'Couldn’t create the PDF. Try again.', t_text: 'Writing time', t_image: 'Image time', timer_vals: 'Writing {a} · Image {b}', timer_on: 'Timer on', timer_off: 'No timer', n_rounds: '{n} rounds', cancel_room: 'Cancel room', end_game: 'End game', confirm_cancel: 'Cancel this room? Everyone will be sent back to the start.', confirm_end: 'End the game now? Everyone will be sent back to the start.', yes_cancel: 'Yes, cancel it', yes_end: 'Yes, end it', keep_room: 'Keep the room', keep_playing: 'Keep playing', e_room_closed: 'The host closed the room.', room_cancelled: 'Room cancelled.', more_seats: '+{n} more seats', empty_seat: 'Waiting for a player…',
+    tagline: 'The AI telephone game where prompts go hilariously wrong.', use_prompt: 'Use this prompt:', host_sets: 'The host sets up the game', pick_avatar: 'Tap to pick your avatar', room_full: 'Room full: tap + on Players to let more people in.', wrap: 'That’s a wrap!', wrap_sub: 'Here’s how every chain went hilariously wrong.', download: 'Download souvenir (PDF)', downloading: 'Preparing your souvenir…', downloaded: 'Souvenir downloaded!', e_pdf: 'Couldn’t create the PDF. Try again.', t_text: 'Writing time', t_image: 'Image time', timer_vals: 'Writing {a} · Image {b}', timer_on: 'Timer on', timer_off: 'No timer', n_rounds: '{n} rounds', cancel_room: 'Cancel room', end_game: 'End game', confirm_cancel: 'Cancel this room? Everyone will be sent back to the start.', confirm_end: 'End the game now? Everyone will be sent back to the start.', yes_cancel: 'Yes, cancel it', yes_end: 'Yes, end it', keep_room: 'Keep the room', keep_playing: 'Keep playing', e_room_closed: 'The host closed the room.', room_cancelled: 'Room cancelled.', more_seats: '+{n} more seats', empty_seat: 'Waiting for a player…',
     play: 'Play', howto: 'How to play', have_code: 'I have a room code', close: 'Close', back: 'Back',
     how1: '**Everyone joins on their phone** and **writes a prompt**.',
     how2: "You get someone else's prompt: **paste it into your AI image generator** and **upload the picture**.",
@@ -54,7 +54,7 @@ const I18N = {
     waiting_host: 'Waiting for the host to start again…', all_chains: 'See all chains', hide_chains: 'Hide chains',
     skipped_in: "The previous player didn't send anything.",
     connecting: 'Connecting…', offline: 'Connection lost. Reconnecting…',
-    e_no_room: 'Room not found. Check the code.', e_started: 'That game has already started.', e_full: 'The room is full.',
+    e_no_room: 'Room not found. Check the code.', e_started: 'That game has already started.', e_full: 'The room is full. Ask the host to add more players.',
     e_bad_name: 'Pick a nickname.', e_name_taken: 'That nickname is taken.', e_kicked: 'You were removed from the room.',
     e_bad_image: "We couldn't use that image. Try another.", e_bad_text: 'Write something first.', e_bad_state: 'Too late for that one!', e_server: 'Something went wrong.', e_slow_down: 'Easy there! Too many actions.',
     e_img: "Couldn't read that image.",
@@ -67,7 +67,7 @@ const I18N = {
     step_prompt_hint: 'Empieza con una idea maravillosamente concreta.', step_guess_hint: 'Solo tienes la imagen. Déjate llevar.',
     press_to_copy: 'Pulsa para copiar', reveal_keys: 'Flechas o Espacio para revelar', progress_label: 'Progreso de jugadores', preview_mode: 'Modo de vista previa: inicia el servidor para usar las salas y el multijugador.',
     copied_room: 'Código de sala copiado', players_ready: '{n} jugadores dentro', connected: 'Conectado', disconnected: 'Reconectando',
-    tagline: 'El teléfono roto con IA donde los prompts se tuercen de lo lindo.', use_prompt: 'Usa este prompt:', host_sets: 'El anfitrión configura la partida', wrap: '¡Y hasta aquí!', wrap_sub: 'Así se torció cada cadena de lo lindo.', download: 'Descargar recuerdo (PDF)', downloading: 'Preparando tu recuerdo…', downloaded: '¡Recuerdo descargado!', e_pdf: 'No se pudo crear el PDF. Inténtalo de nuevo.', t_text: 'Tiempo para escribir', t_image: 'Tiempo para la imagen', timer_vals: 'Escribir {a} · Imagen {b}', timer_on: 'Con temporizador', timer_off: 'Sin temporizador', n_rounds: '{n} rondas', cancel_room: 'Cancelar sala', end_game: 'Terminar partida', confirm_cancel: '¿Cancelar esta sala? Todos volverán al inicio.', confirm_end: '¿Terminar la partida ahora? Todos volverán al inicio.', yes_cancel: 'Sí, cancelarla', yes_end: 'Sí, terminarla', keep_room: 'Mantener la sala', keep_playing: 'Seguir jugando', e_room_closed: 'El anfitrión ha cerrado la sala.', room_cancelled: 'Sala cancelada.', more_seats: '+{n} plazas más', empty_seat: 'Esperando jugador…',
+    tagline: 'El teléfono roto con IA donde los prompts se tuercen de lo lindo.', use_prompt: 'Usa este prompt:', host_sets: 'El anfitrión configura la partida', pick_avatar: 'Toca para elegir tu avatar', room_full: 'Sala llena: pulsa + en Jugadores para que entre más gente.', wrap: '¡Y hasta aquí!', wrap_sub: 'Así se torció cada cadena de lo lindo.', download: 'Descargar recuerdo (PDF)', downloading: 'Preparando tu recuerdo…', downloaded: '¡Recuerdo descargado!', e_pdf: 'No se pudo crear el PDF. Inténtalo de nuevo.', t_text: 'Tiempo para escribir', t_image: 'Tiempo para la imagen', timer_vals: 'Escribir {a} · Imagen {b}', timer_on: 'Con temporizador', timer_off: 'Sin temporizador', n_rounds: '{n} rondas', cancel_room: 'Cancelar sala', end_game: 'Terminar partida', confirm_cancel: '¿Cancelar esta sala? Todos volverán al inicio.', confirm_end: '¿Terminar la partida ahora? Todos volverán al inicio.', yes_cancel: 'Sí, cancelarla', yes_end: 'Sí, terminarla', keep_room: 'Mantener la sala', keep_playing: 'Seguir jugando', e_room_closed: 'El anfitrión ha cerrado la sala.', room_cancelled: 'Sala cancelada.', more_seats: '+{n} plazas más', empty_seat: 'Esperando jugador…',
     play: 'Jugar', howto: 'Cómo jugar', have_code: 'Tengo un código de sala', close: 'Cerrar', back: 'Volver',
     how1: '**Todos entran desde el móvil** y **escriben un prompt**.',
     how2: 'Recibes el prompt de otra persona: **pégalo en tu generador de imágenes con IA** y **sube la imagen**.',
@@ -102,7 +102,7 @@ const I18N = {
     waiting_host: 'Esperando a que el anfitrión empiece otra vez…', all_chains: 'Ver todas las cadenas', hide_chains: 'Ocultar cadenas',
     skipped_in: 'El jugador anterior no envió nada.',
     connecting: 'Conectando…', offline: 'Conexión perdida. Reconectando…',
-    e_no_room: 'Sala no encontrada. Revisa el código.', e_started: 'Esa partida ya ha empezado.', e_full: 'La sala está llena.',
+    e_no_room: 'Sala no encontrada. Revisa el código.', e_started: 'Esa partida ya ha empezado.', e_full: 'La sala está llena. Pide al anfitrión que añada más jugadores.',
     e_bad_name: 'Elige un apodo.', e_name_taken: 'Ese apodo ya está en uso.', e_kicked: 'Te han quitado de la sala.',
     e_bad_image: 'No pudimos usar esa imagen. Prueba con otra.', e_bad_text: 'Escribe algo primero.', e_bad_state: '¡Demasiado tarde!', e_server: 'Algo salió mal.', e_slow_down: '¡Despacio! Demasiadas acciones.',
     e_img: 'No se pudo leer esa imagen.',
@@ -153,11 +153,13 @@ function rich(str, nodes = {}) {
   return out;
 }
 const ic = (name, cls = '') => h('i', { class: `ic ic-${name} ${cls}`, 'aria-hidden': 'true' });
-/** CSS smiley avatar. Hue comes from the server (i * 137.5 mod 360) and maps to a distinct board colour. */
-function avatar(hue, cls = '') {
-  const c = Math.floor((((Math.round(hue) % 360) + 360) % 360) / 45) % 8;
-  const f = c % 4;
-  return h('span', { class: `avatar c${c} f${f} ${cls}`, 'aria-hidden': 'true' });
+/** Player avatar: their emoji on a colour disc (colour from the server hue). Falls back to a CSS smiley. */
+function avatar(who, cls = '') {
+  const hue = typeof who === 'object' && who ? who.hue : who;
+  const emoji = typeof who === 'object' && who ? who.emoji : null;
+  const c = Math.floor((((Math.round(hue || 0) % 360) + 360) % 360) / 45) % 8;
+  if (emoji) return h('span', { class: `avatar c${c} has-em ${cls}`, 'aria-hidden': 'true' }, h('span', { class: 'em' }, emoji));
+  return h('span', { class: `avatar c${c} f${c % 4} ${cls}`, 'aria-hidden': 'true' });
 }
 const confetti = (n) => h('span', { class: 'confetti', 'aria-hidden': 'true' }, Array.from({ length: n }, () => h('i')));
 function logo(size = 'xl') {
@@ -230,7 +232,9 @@ const urlCode = (new URLSearchParams(location.search).get('r') || '').toUpperCas
 let hostSess = LS.get('pw_host');
 let playerSess = LS.get('pw_player');
 const draft = { code: urlCode, name: (playerSess && playerSess.name) || '', text: '', guess: '', img: null, busy: false };
-let cfg = Object.assign({ players: 8, rounds: 3, timer: true, tText: 60, tImage: 150 }, LS.get('pw_cfg') || {});
+const savedCfg = LS.get('pw_cfg') || {};
+let cfg = { players: 3, rounds: 3, timer: savedCfg.timer !== false, tText: savedCfg.tText || 60, tImage: savedCfg.tImage || 150 };
+const saveCfg = () => LS.set('pw_cfg', { timer: cfg.timer, tText: cfg.tText, tImage: cfg.tImage });
 const T_TEXT = { min: 15, max: 600, step: 15 }, T_IMAGE = { min: 30, max: 1200, step: 30 };
 const clampT = (v, r) => Math.max(r.min, Math.min(r.max, v));
 const fmtS = (sec) => Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
@@ -262,7 +266,7 @@ function send(obj) {
   return false;
 }
 function resetSession(kind) {
-  if (kind === 'host') { LS.del('pw_host'); hostSess = null; }
+  if (kind === 'host') { LS.del('pw_host'); hostSess = null; cfg.players = 3; cfg.rounds = 3; }
   if (kind === 'player') { LS.del('pw_player'); playerSess = null; }
   role = null; S = null; V = 'landing'; V2 = null; rv = null; lastKey = null;
 }
@@ -401,7 +405,7 @@ function slot(step, i, state, opts = {}) {
   return h('div', { class: `slot ${step.type} ${state} ${opts.enter ? 'enter' : ''}` },
     h('div', { class: 'lbl' }, h('b', null, (i + 1) + '.'), stepName(step.type)),
     box,
-    showWho ? h('span', { class: 'who' }, avatar(step.hue), step.author) : h('span', { class: 'who' }, ' '));
+    showWho ? h('span', { class: 'who' }, avatar(step), step.author) : h('span', { class: 'who' }, ' '));
 }
 function chainStrip(chain) {
   const kids = [];
@@ -453,7 +457,7 @@ function setupView() {
   const set = (patch) => {
     const before = JSON.stringify(cfg);
     cfg = Object.assign(cfg, patch); cfg.rounds = Math.max(3, Math.min(cfg.rounds, cfg.players));
-    cfg.tText = clampT(cfg.tText, T_TEXT); cfg.tImage = clampT(cfg.tImage, T_IMAGE); LS.set('pw_cfg', cfg); render();
+    cfg.tText = clampT(cfg.tText, T_TEXT); cfg.tImage = clampT(cfg.tImage, T_IMAGE); saveCfg(); render();
     return before !== JSON.stringify(cfg);
   };
   mount('setup', h('main', { class: 'screen mid' },
@@ -502,10 +506,10 @@ function lobbyView() {
     c.tText = clampT(c.tText, T_TEXT); c.tImage = clampT(c.tImage, T_IMAGE);
     // optimistic: update locally right away, server confirms
     if (c.players === S.expected && c.rounds === S.rounds && c.timer === S.timerOn && c.tText === S.tText && c.tImage === S.tImage) return false;
-    Object.assign(S, { expected: c.players, rounds: c.rounds, timerOn: c.timer, tText: c.tText, tImage: c.tImage }); cfg = c; LS.set('pw_cfg', cfg); send(Object.assign({ t: 'config' }, c)); render();
+    Object.assign(S, { expected: c.players, rounds: c.rounds, timerOn: c.timer, tText: c.tText, tImage: c.tImage }); cfg = c; saveCfg(); send(Object.assign({ t: 'config' }, c)); render();
     return true;
   };
-  const rows = S.players.map((p) => h('div', { class: 'prow' + (p.connected ? '' : ' off'), 'data-k': p.id }, avatar(p.hue, p.connected ? '' : 'off'), h('span', { class: 'n' }, p.name), ic('check'),
+  const rows = S.players.map((p) => h('div', { class: 'prow' + (p.connected ? '' : ' off'), 'data-k': p.id }, avatar(p, p.connected ? '' : 'off'), h('span', { class: 'n' }, p.name), ic('check'),
     h('button', { class: 'kick', 'aria-label': t('kick') + ' ' + p.name, onclick: act({ t: 'kick', id: p.id }) }, ic('close'))));
   const seats = S.expected - n, showSeats = Math.min(seats, Math.max(0, 8 - n));
   for (let i = 0; i < showSeats; i++) rows.push(h('div', { class: 'empty-seat', 'data-k': 'seat' + i }, h('span', { class: 'avatar-slot' }), t('empty_seat')));
@@ -526,6 +530,7 @@ function lobbyView() {
       h('div', { class: 'players-panel' },
         h('h3', { 'aria-live': 'polite' }, t('n_players', { n, max: S.expected })),
         h('div', { class: 'plist' + (n > 16 ? ' three' : n > 8 ? ' two' : '') }, rows),
+        n >= S.expected && n < MAXP() ? h('p', { class: 'full-hint' }, t('room_full')) : null,
         h('button', { class: 'btn primary big block', disabled: n < 3, onclick: act({ t: 'start' }) }, n < 3 ? t('need_more') : [ic('play'), t('start')]),
         h('button', { class: 'btn danger-outline block', onclick: () => closeRoom(false) }, ic('close'), t('cancel_room'))))));
 }
@@ -538,7 +543,7 @@ function roundView() {
     h('p', { class: 'instr' }, t('i_' + type)),
     h('div', { class: 'pgrid' + (S.players.length > 12 ? ' many' : ''), role: 'list', 'aria-label': t('progress_label') }, S.players.map((p) =>
       h('div', { class: 'pstat ' + (p.done ? 'done' : p.connected ? 'work' : 'lost'), role: 'listitem', 'data-k': p.id },
-        avatar(p.hue, p.connected ? '' : 'off'), h('span', { class: 'n' }, p.name),
+        avatar(p, p.connected ? '' : 'off'), h('span', { class: 'n' }, p.name),
         h('span', { class: 'st' }, p.done ? [t('done'), ic('check')] : p.connected ? t('working') : [ic('warn'), t('disconnected')])))),
     h('div', { class: 'foot' },
       h('div', { class: 'progress' },
@@ -629,7 +634,7 @@ function endView() {
 
 // ======================================================= views: player
 function phoneHeader() {
-  return h('div', { class: 'phead' }, h('span', { class: 'pill' }, avatar(S.me.hue), S.me.name), timerPill());
+  return h('div', { class: 'phead' }, h('span', { class: 'pill' }, avatar(S.me), S.me.name), timerPill());
 }
 async function fileToJpeg(file) {
   const url = URL.createObjectURL(file);
@@ -704,10 +709,15 @@ function playerView() {
   lastKey = null; pasteHandler = null;
   if (ph === 'lobby') {
     mount('p-lobby', h('main', { class: 'screen mid' },
-      h('div', { class: 'milestone' }, h('div', { class: 'hourglass', 'aria-hidden': 'true' }, h('span', { class: 'glass' }), h('span', { class: 'rim' }))),
+      h('div', { class: 'milestone small' }, h('div', { class: 'hourglass', 'aria-hidden': 'true' }, h('span', { class: 'glass' }), h('span', { class: 'rim' }))),
       h('h2', null, t('youre_in')), h('p', { class: 'muted' }, t('waiting_start')),
-      h('div', { class: 'avatars-row' }, S.players.map((p) => avatar(p.hue, 'lg' + (p.connected ? '' : ' off')))),
-      h('span', { class: 'pill me-pill' }, avatar(S.me.hue), S.me.name),
+      h('div', { class: 'avatars-row' }, S.players.map((p, i) => h('span', { 'data-k': 'a' + i }, avatar(p, 'lg' + (p.connected ? '' : ' off'))))),
+      h('div', { class: 'me-card' },
+        avatar(S.me, 'xl'), h('span', { class: 'me-name' }, S.me.name),
+        h('p', { class: 'pick-title' }, t('pick_avatar')),
+        h('div', { class: 'emoji-grid', role: 'radiogroup', 'aria-label': t('pick_avatar') }, (S.emojis || []).map((e) =>
+          h('button', { class: 'emo' + (e === S.me.emoji ? ' on' : ''), role: 'radio', 'aria-checked': String(e === S.me.emoji), 'aria-label': e,
+            onclick: () => { if (e === S.me.emoji) return; if (send({ t: 'emoji', emoji: e })) { S.me.emoji = e; const mine = S.players.find((p) => p.name === S.me.name); if (mine) mine.emoji = e; render(); } } }, e)))),
       S.expected ? h('div', { class: 'gameinfo', 'aria-label': t('host_sets') },
         h('span', { class: 'gi-title' }, ic('crown'), t('host_sets')),
         h('div', { class: 'gi-row' },

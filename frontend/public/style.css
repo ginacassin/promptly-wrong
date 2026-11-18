@@ -677,3 +677,33 @@ body.phone .wrap-actions .btn { width: 100%; }
 .time-steppers { display: flex; flex-direction: column; gap: .5em; }
 .settings .time-steppers { flex-direction: row; flex-wrap: wrap; }
 .stepper .val.time { min-width: 2.6em; font-size: 1em; padding: 0 .35em; }
+
+/* ---------- emoji avatars ---------- */
+.avatar.has-em { display: inline-grid; place-items: center; overflow: hidden; }
+.avatar.has-em::before, .avatar.has-em::after { display: none; }
+.avatar .em { font-size: 1.02em; line-height: 1; font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif; transform: translateY(.02em); }
+.avatar.lg .em { font-size: 1.6em; }
+.avatar.xl .em { font-size: 2em; }
+.pstat .avatar .em { font-size: 1.75em; }
+.pgrid.many .pstat .avatar .em { font-size: 1.2em; }
+.avatar.c0.has-em { --c: #FF8CC4; } .avatar.c1.has-em { --c: #8DEFFF; } .avatar.c2.has-em { --c: #FFE58A; } .avatar.c3.has-em { --c: #CFB2FF; }
+.avatar.c4.has-em { --c: #FFC38A; } .avatar.c5.has-em { --c: #A8C8FF; } .avatar.c6.has-em { --c: #DDFF8A; } .avatar.c7.has-em { --c: #FFADAD; }
+
+/* waiting screen: your avatar + picker */
+.me-card { width: 100%; max-width: 360px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-xl); background: rgba(11,10,26,.45); }
+.me-card .avatar.xl { width: 72px; height: 72px; font-size: 16px; box-shadow: 0 0 0 4px rgba(200,255,61,.5), 0 0 22px rgba(200,255,61,.35); }
+.me-card .avatar.xl .em { font-size: 44px; }
+.me-name { font: 800 18px var(--font-brand); }
+.pick-title { font-size: 13px; font-weight: 700; color: var(--muted); }
+.emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; width: 100%; }
+.emo { display: grid; place-items: center; aspect-ratio: 1; min-height: 44px; padding: 0; border: 2px solid transparent; border-radius: 12px; background: rgba(42,29,92,.85); font-size: 26px; line-height: 1; cursor: pointer; touch-action: manipulation; transition: transform .12s, border-color .12s, background .12s; font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif; }
+.emo.on { border-color: var(--color-accent); background: rgba(200,255,61,.18); box-shadow: 0 0 12px rgba(200,255,61,.35); }
+.emo:active { transform: scale(.92); }
+@media (hover: hover) { .emo:hover { transform: translateY(-2px); background: rgba(58,42,122,.95); } }
+.emo:focus-visible { outline: 3px solid var(--color-info); outline-offset: 2px; }
+.avatars-row .avatar.lg { width: 44px; height: 44px; font-size: 16px; }
+.avatars-row .avatar.lg .em { font-size: 26px; }
+.full-hint { font-size: .62em; font-weight: 700; color: var(--color-warning); text-align: center; }
+body.phone .full-hint { font-size: 13px; }
+.milestone.small { width: 90px; height: 90px; margin-bottom: 0; }
+.milestone.small .hourglass { transform-origin: center; scale: .7; }
