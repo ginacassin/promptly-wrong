@@ -247,6 +247,8 @@ function playerView(room, playerId, now) {
     phase: room.phase,
     me: { id: me.id, name: me.name, hue: hueOf(room, me.id) },
     rounds: room.rounds,
+    expected: room.expected,
+    timerOn: room.timerOn,
     round: room.round,
     timeLeft: timeLeft(room, now),
     players: room.players.map((p) => ({ name: p.name, hue: hueOf(room, p.id), connected: !!p.online })),

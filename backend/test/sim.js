@@ -57,6 +57,15 @@ async function fullGame({ hostPort, playerPorts, N = 4, R = 3, label }) {
   assert.equal((await dup.until((m) => m.t === 'error')).code, 'name_taken');
   await host.until((m) => m.t === 'host_state' && m.players.length === N);
 
+  // only the host can change settings or start: player commands are ignored
+  const exp0 = host.state.expected;
+  ps[0].send({ t: 'config', players: 3, rounds: 3, timer: false });
+  ps[0].send({ t: 'start' }); ps[0].send({ t: 'close' }); ps[0].send({ t: 'kick', id: 'x' });
+  await sleep(300);
+  assert.equal(host.state.expected, exp0, 'player must not change settings');
+  assert.equal(host.state.phase, 'lobby', 'player must not start the game');
+  assert.equal(ps[1].state.expected, exp0, 'players see the settings');
+
   host.send({ t: 'start' });
   for (let r = 0; r < R; r++) {
     for (const p of ps) await p.until((m) => m.t === 'player_state' && m.phase === 'round' && m.round === r && !m.done);
