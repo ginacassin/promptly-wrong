@@ -37,6 +37,11 @@ class MemoryStore {
     return { room, res };
   }
 
+  async delete(code) {
+    this.rooms.delete(code);
+    await this.dropImages(code);
+  }
+
   async due(now) {
     const out = [];
     for (const r of this.rooms.values()) if (r.phase === 'round' && r.deadline != null && r.deadline <= now) out.push(r.code);

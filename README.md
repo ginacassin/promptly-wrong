@@ -9,7 +9,7 @@ The AI telephone game where prompts go hilariously wrong. Jackbox-style: one sha
 4. Round 3: the next player sees only the picture and guesses the prompt. Then image, guess, image, ...
 5. The TV reveals every chain step by step. Leaderboard + "drift" stat at the end.
 
-Rounds are 3..players (nobody touches the same chain twice). Odd rounds end on a guess.
+Up to 30 players per room by default (`MAX_PLAYERS`). The host can cancel the room at any time; everyone is sent back to the start. Rounds are 3..players (nobody touches the same chain twice). Odd rounds end on a guess.
 **Scoring:** each guess scores 0-100 for closeness to the text that produced the image (word overlap + edit distance, accent-insensitive); the image maker shares the points.
 
 ## Architecture
@@ -31,6 +31,7 @@ browser ──▶ │  /       → frontend (nginx, static)                │
 | `PORT` | `3000` | |
 | `REDIS_URL` | *(empty → memory)* | e.g. `redis://default:pass@promptly-wrong-redis:6379` |
 | `ROOM_TTL_HOURS` | `6` | rooms + images expire after this idle time |
+| `MAX_PLAYERS` | `30` | per-room player cap (3–100) |
 
 Routes match by suffix, so the backend works at `/`, `/api`, or any prefix with or without "strip path": `GET …/healthz`, `GET …/qr.svg?u=`, `GET …/img/CODE/ID`, `WS …/ws`.
 

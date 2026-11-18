@@ -23,6 +23,7 @@ const REDIS_URL = process.env.REDIS_URL || '';
 const ROOM_TTL_MS = Number(process.env.ROOM_TTL_HOURS || 6) * 3600_000;
 const STATIC_DIR = process.env.STATIC_DIR ? path.resolve(process.env.STATIC_DIR) : null; // dev only: also serve the frontend
 const MAX_IMG_BYTES = 4 * 1024 * 1024;
+const DEV_LATENCY_MS = Number(process.env.DEV_LATENCY_MS || 0); // testing only: simulate a slow link
 const INSTANCE = process.env.HOSTNAME || crypto.randomBytes(3).toString('hex');
 
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2', '.ico': 'image/x-icon' };
@@ -49,7 +50,7 @@ async function main() {
     const room = await store.get(code);
     const now = Date.now();
     for (const ws of set) {
-      if (!room) { send(ws, { t: 'error', code: 'no_room' }); continue; }
+      if (!room) { send(ws, { t: 'error', code: 'room_closed' }); detach(code, ws); ws.ctx = null; continue; }
       if (ws.ctx.role === 'host') send(ws, G.hostView(room, now));
       else {
         const view = G.playerView(room, ws.ctx.playerId, now);
@@ -157,7 +158,8 @@ async function main() {
       b.tokens -= 1;
       let msg;
       try { msg = JSON.parse(raw.toString()); } catch { return; }
-      handle(ws, msg).catch((e) => { console.error('handler', e); send(ws, { t: 'error', code: 'server' }); });
+      const run = () => handle(ws, msg).catch((e) => { console.error('handler', e); send(ws, { t: 'error', code: 'server' }); });
+      if (DEV_LATENCY_MS) setTimeout(run, DEV_LATENCY_MS); else run();
     });
     ws.on('close', () => {
       const c = ws.ctx;
@@ -237,6 +239,12 @@ async function main() {
     }
 
     // host-only commands
+    if (msg.t === 'close') {
+      // Cancel the room: delete it everywhere; every replica tells its sockets via fanout.
+      await store.delete(c.code);
+      await store.publish(c.code);
+      return;
+    }
     const ops = {
       config: (r) => G.configure(r, msg),
       kick: (r) => G.kick(r, msg.id),

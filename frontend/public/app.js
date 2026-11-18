@@ -19,7 +19,7 @@ const I18N = {
     step_prompt_hint: 'Start with a wonderfully specific idea.', step_guess_hint: 'You only get the picture. Trust your instincts.',
     press_to_copy: 'Tap to copy', reveal_keys: 'Arrow keys or Space to reveal', progress_label: 'Player progress', preview_mode: 'Preview mode: start the game server to use rooms and multiplayer.',
     copied_room: 'Room code copied', players_ready: '{n} players joined', connected: 'Connected', disconnected: 'Reconnecting',
-    tagline: 'The AI telephone game where prompts go hilariously wrong.', use_prompt: 'Use this prompt:', empty_seat: 'Waiting for a player…',
+    tagline: 'The AI telephone game where prompts go hilariously wrong.', use_prompt: 'Use this prompt:', cancel_room: 'Cancel room', end_game: 'End game', confirm_cancel: 'Cancel this room? Everyone will be sent back to the start.', confirm_end: 'End the game now? Everyone will be sent back to the start.', yes_cancel: 'Yes, cancel it', yes_end: 'Yes, end it', keep_room: 'Keep the room', keep_playing: 'Keep playing', e_room_closed: 'The host closed the room.', room_cancelled: 'Room cancelled.', more_seats: '+{n} more seats', empty_seat: 'Waiting for a player…',
     play: 'Play', howto: 'How to play', have_code: 'I have a room code', close: 'Close', back: 'Back',
     how1: 'Everyone joins on their phone and writes a prompt.',
     how2: "You get someone else's prompt: paste it into your favourite AI image generator and upload the picture.",
@@ -67,7 +67,7 @@ const I18N = {
     step_prompt_hint: 'Empieza con una idea maravillosamente concreta.', step_guess_hint: 'Solo tienes la imagen. Déjate llevar.',
     press_to_copy: 'Pulsa para copiar', reveal_keys: 'Flechas o Espacio para revelar', progress_label: 'Progreso de jugadores', preview_mode: 'Modo de vista previa: inicia el servidor para usar las salas y el multijugador.',
     copied_room: 'Código de sala copiado', players_ready: '{n} jugadores dentro', connected: 'Conectado', disconnected: 'Reconectando',
-    tagline: 'El teléfono roto con IA donde los prompts se tuercen de lo lindo.', use_prompt: 'Usa este prompt:', empty_seat: 'Esperando jugador…',
+    tagline: 'El teléfono roto con IA donde los prompts se tuercen de lo lindo.', use_prompt: 'Usa este prompt:', cancel_room: 'Cancelar sala', end_game: 'Terminar partida', confirm_cancel: '¿Cancelar esta sala? Todos volverán al inicio.', confirm_end: '¿Terminar la partida ahora? Todos volverán al inicio.', yes_cancel: 'Sí, cancelarla', yes_end: 'Sí, terminarla', keep_room: 'Mantener la sala', keep_playing: 'Seguir jugando', e_room_closed: 'El anfitrión ha cerrado la sala.', room_cancelled: 'Sala cancelada.', more_seats: '+{n} plazas más', empty_seat: 'Esperando jugador…',
     play: 'Jugar', howto: 'Cómo jugar', have_code: 'Tengo un código de sala', close: 'Cerrar', back: 'Volver',
     how1: 'Todos entran desde el móvil y escriben un prompt.',
     how2: 'Recibes el prompt de otra persona: pégalo en tu generador de imágenes con IA favorito y sube la imagen.',
@@ -128,7 +128,7 @@ function h(tag, props, ...kids) {
   for (const [k, v] of Object.entries(props || {})) {
     if (v == null || v === false) continue;
     if (k === 'class') e.className = v;
-    else if (k.startsWith('on')) e.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k.startsWith('on')) e[k.toLowerCase()] = v;
     else if (k === 'value' || k === 'disabled' || k === 'checked' || k === 'textContent') e[k] = v;
     else e.setAttribute(k, v === true ? '' : v);
   }
@@ -177,7 +177,36 @@ async function copyText(text) {
   toast(t(text === S?.code ? 'copied_room' : 'copied'));
 }
 const fmt = (ms) => { const s = Math.ceil(ms / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
-const mount = (...nodes) => { $app.replaceChildren(...nodes); };
+const HANDLERS = ['onclick', 'oninput', 'onchange', 'onsubmit', 'ondragover', 'ondragleave', 'ondrop', 'onpointerdown', 'onpointerup', 'onpointerleave', 'onpointercancel', 'onkeydown', 'oncontextmenu'];
+/** Patch DOM node a into b's shape, keeping existing nodes (no flashes, animations keep running, images not reloaded). */
+function morph(a, b) {
+  if (a.nodeType !== b.nodeType || a.nodeName !== b.nodeName || (a.nodeType === 1 && (a.dataset.k || '') !== (b.dataset.k || ''))) { a.replaceWith(b); return; }
+  if (a.nodeType === 3) { if (a.data !== b.data) a.data = b.data; return; }
+  if (a.nodeType !== 1) return;
+  for (const { name } of [...a.attributes]) if (!b.hasAttribute(name)) a.removeAttribute(name);
+  for (const { name, value } of [...b.attributes]) if (a.getAttribute(name) !== value) a.setAttribute(name, value);
+  for (const k of HANDLERS) if (a[k] !== b[k]) a[k] = b[k];
+  if ('disabled' in b && a.disabled !== b.disabled) a.disabled = b.disabled;
+  if ((a.tagName === 'INPUT' || a.tagName === 'TEXTAREA') && a !== document.activeElement && a.value !== b.value) a.value = b.value;
+  const ak = [...a.childNodes], bk = [...b.childNodes];
+  bk.forEach((bc, i) => { if (ak[i]) morph(ak[i], bc); else a.appendChild(bc); });
+  for (let i = bk.length; i < ak.length; i++) ak[i].remove();
+}
+let viewKey = null;
+/** Mount a screen. Same key → patch in place; new key → replace and play the entrance animation. */
+function mount(key, root, { fresh = false } = {}) {
+  const cur = $app.firstElementChild;
+  if (cur && key === viewKey && !fresh) { root.classList.add('noanim'); morph(cur, root); }
+  else { if (key === viewKey) root.classList.add('noanim'); $app.replaceChildren(root); }
+  viewKey = key;
+}
+/** Immediate feedback for actions that wait on the server; the next render clears it. */
+function pending(btn) {
+  if (!btn) return;
+  btn.classList.add('loading'); btn.disabled = true; btn.setAttribute('aria-busy', 'true');
+  setTimeout(() => { if (btn.isConnected && btn.classList.contains('loading')) { btn.classList.remove('loading'); btn.disabled = false; btn.removeAttribute('aria-busy'); } }, 8000);
+}
+const act = (msg) => (e) => { const b = e && e.currentTarget; if (send(msg)) pending(b); };
 
 // ======================================================= state
 let S = null;            // last server state
@@ -192,6 +221,7 @@ let playerSess = LS.get('pw_player');
 const draft = { code: urlCode, name: (playerSess && playerSess.name) || '', text: '', guess: '', img: null, busy: false };
 let cfg = Object.assign({ players: 8, rounds: 3, timer: true }, LS.get('pw_cfg') || {});
 let rv = null;           // reveal cursor {c, s, busy}
+const MAXP = () => (S && S.maxPlayers) || 30;
 const qrCache = new Map();
 
 if (urlCode) { V = 'join'; if (playerSess && playerSess.code === urlCode) role = 'player'; }
@@ -246,6 +276,14 @@ function onMsg(m) {
       if (m.code === 'no_room' && role === 'host') { resetSession('host'); toast(msg, 'error'); return render(); }
       if (m.code === 'no_room' && role === 'player' && playerSess) { resetSession('player'); V = 'join'; toast(msg, 'error'); return render(); }
       if (m.code === 'kicked') { resetSession('player'); toast(msg, 'error'); return render(); }
+      if (m.code === 'room_closed') {
+        const wasHost = role === 'host';
+        document.querySelectorAll('.modal').forEach((x) => x.remove());
+        resetSession(wasHost ? 'host' : 'player');
+        if (!wasHost) V = 'landing';
+        toast(wasHost ? t('room_cancelled') : t('e_room_closed'), wasHost ? 'ok' : 'error');
+        return render();
+      }
       draft.busy = false;
       toast(msg, 'error');
       if (S) { lastKey = null; render(); }
@@ -282,16 +320,26 @@ setInterval(() => {
 
 // ======================================================= views: shared
 function setBodyClass() {
-  const tv = role === 'host' || (!role && (V === 'landing' || V === 'setup') && window.innerWidth >= 900);
-  document.body.className = tv ? 'tv' : 'phone';
+  const wide = window.innerWidth >= 900 && window.innerHeight >= 500;
+  const tv = (role === 'host' || (!role && (V === 'landing' || V === 'setup'))) && wide;
+  document.body.className = (tv ? 'tv' : 'phone') + (role === 'host' ? ' host' : '');
 }
-function stepper(label, val, min, max, onChange) {
+/** Stepper: tap to change by 1, press and hold to repeat. onDelta(±1) reads current state itself. */
+function stepper(label, val, min, max, onDelta) {
+  const btn = (d, cls, aria, dis) => {
+    let tmr = null;
+    const stop = () => { clearTimeout(tmr); clearInterval(tmr); tmr = null; };
+    return h('button', { 'aria-label': `${label} ${aria}`, disabled: dis,
+      onpointerdown: (e) => { if (e.button > 0) return; e.preventDefault(); onDelta(d); stop(); tmr = setTimeout(() => { tmr = setInterval(() => onDelta(d), 110); }, 420); },
+      onpointerup: stop, onpointerleave: stop, onpointercancel: stop, oncontextmenu: (e) => e.preventDefault(),
+      onclick: (e) => { if (e.detail === 0) onDelta(d); } }, h('i', { class: cls }));
+  };
   return h('div', { class: 'stepper' },
     h('span', null, label),
     h('span', { class: 'ctl' },
-      h('button', { 'aria-label': `${label} −`, disabled: val <= min, onclick: () => onChange(val - 1) }, h('i', { class: 'minus' })),
+      btn(-1, 'minus', '−', val <= min),
       h('span', { class: 'val', 'aria-live': 'polite' }, String(val)),
-      h('button', { 'aria-label': `${label} +`, disabled: val >= max, onclick: () => onChange(val + 1) }, h('i', { class: 'plus' }))));
+      btn(1, 'plus', '+', val >= max)));
 }
 function toggle(label, on, onChange) {
   return h('div', { class: 'stepper' }, h('span', null, label),
@@ -307,6 +355,18 @@ function showHowTo() {
   document.body.appendChild(m);
   m.querySelector('button').focus();
 }
+function confirmBox(text, yes, no, onYes) {
+  document.querySelectorAll('.modal').forEach((x) => x.remove());
+  const m = h('div', { class: 'modal', role: 'alertdialog', 'aria-modal': 'true', 'aria-label': text, onclick: (e) => { if (e.target === m) m.remove(); } },
+    h('div', { class: 'card confirm' }, h('p', { class: 'confirm-text' }, text),
+      h('div', { class: 'confirm-btns' },
+        h('button', { class: 'btn secondary', onclick: () => m.remove() }, no),
+        h('button', { class: 'btn danger', onclick: (e) => { pending(e.currentTarget); onYes(); } }, yes))));
+  document.body.appendChild(m);
+  m.querySelector('.btn.secondary').focus();
+}
+const closeRoom = (inGame) => confirmBox(t(inGame ? 'confirm_end' : 'confirm_cancel'), t(inGame ? 'yes_end' : 'yes_cancel'), t(inGame ? 'keep_playing' : 'keep_room'), () => { if (!send({ t: 'close' })) document.querySelector('.modal')?.remove(); });
+const endBtn = () => h('button', { class: 'btn endgame', onclick: () => closeRoom(true) }, ic('close'), t('end_game'));
 const stepName = (type) => t(type === 'prompt' ? 's_prompt' : type === 'image' ? 's_image' : 's_guess');
 
 /** One reveal slot: number + label, the card (bubble / image frame), author. */
@@ -353,7 +413,7 @@ function qrBox(url) {
 
 // ======================================================= views: no session
 function landingView() {
-  mount(h('main', { class: 'screen home' },
+  mount('landing', h('main', { class: 'screen home' },
     h('span', { class: 'star twinkle', 'aria-hidden': 'true' }), h('span', { class: 'star solid b twinkle', 'aria-hidden': 'true' }),
     logo('xl'),
     h('p', { class: 'tagline' }, t('tagline')),
@@ -364,14 +424,14 @@ function landingView() {
 }
 function setupView() {
   const set = (patch) => { cfg = Object.assign(cfg, patch); cfg.rounds = Math.max(3, Math.min(cfg.rounds, cfg.players)); LS.set('pw_cfg', cfg); render(); };
-  mount(h('main', { class: 'screen mid' },
+  mount('setup', h('main', { class: 'screen mid' },
     h('div', { class: 'card setup-card' },
       h('h2', null, t('setup')),
-      stepper(t('players'), cfg.players, 3, 12, (v) => set({ players: v })),
-      stepper(t('rounds'), cfg.rounds, 3, cfg.players, (v) => set({ rounds: v })),
+      stepper(t('players'), cfg.players, 3, MAXP(), (d) => set({ players: Math.max(3, Math.min(MAXP(), cfg.players + d)) })),
+      stepper(t('rounds'), cfg.rounds, 3, cfg.players, (d) => set({ rounds: Math.max(3, Math.min(cfg.players, cfg.rounds + d)) })),
       toggle(t('timer'), cfg.timer, (v) => set({ timer: v })),
       h('p', { class: 'hint' }, t('rounds_hint')),
-      h('button', { class: 'btn primary big block', onclick: () => send({ t: 'host_create', players: cfg.players, rounds: cfg.rounds, timer: cfg.timer }) }, t('create_room')),
+      h('button', { class: 'btn primary big block', onclick: act({ t: 'host_create', players: cfg.players, rounds: cfg.rounds, timer: cfg.timer }) }, t('create_room')),
       h('button', { class: 'btn ghost block', onclick: () => { V = 'landing'; render(); } }, t('back')))));
 }
 function joinView() {
@@ -383,19 +443,19 @@ function joinView() {
     e && e.preventDefault();
     if (!draft.code || draft.code.length < 4) return toast(t('e_no_room'), 'error');
     if (!draft.name.trim()) return toast(t('e_bad_name'), 'error');
-    send({ t: 'join', code: draft.code, name: draft.name.trim() });
+    if (send({ t: 'join', code: draft.code, name: draft.name.trim() })) pending(e && e.currentTarget && e.currentTarget.querySelector('button[type=submit]'));
   };
-  mount(h('form', { class: 'screen join', onsubmit: go },
+  mount('join', h('form', { class: 'screen join', onsubmit: go },
     h('div', { class: 'center' }, logo('sm')),
     h('h2', { class: 'ptitle' }, t('join_game')),
     h('label', { class: 'field' }, t('room_code'), code),
     h('label', { class: 'field' }, t('nickname'), name),
     h('button', { class: 'btn primary big block', type: 'submit' }, t('join')),
-    h('button', { class: 'btn ghost block', type: 'button', onclick: () => { V = 'landing'; render(); } }, t('back'))));
+    h('button', { class: 'btn ghost block', type: 'button', onclick: () => { V = 'landing'; render(); } }, t('back'))), { fresh: true });
   if (!draft.code) code.focus(); else if (!draft.name) name.focus();
 }
 function connectingView() {
-  mount(h('main', { class: 'screen mid' }, logo('sm'), h('p', { class: 'muted' }, t('connecting'))));
+  mount('connecting', h('main', { class: 'screen mid' }, logo('sm'), h('p', { class: 'muted' }, t('connecting'))));
 }
 
 // ======================================================= views: host
@@ -403,12 +463,19 @@ function lobbyView() {
   const joinUrl = `${location.origin}${BASE}?r=${S.code}`;
   const shown = location.host + BASE.replace(/\/$/, '');
   const n = S.players.length;
-  const set = (patch) => { const c = Object.assign({ players: S.expected, rounds: S.rounds, timer: S.timerOn }, patch); c.rounds = Math.max(3, Math.min(c.rounds, c.players)); cfg = c; LS.set('pw_cfg', cfg); send(Object.assign({ t: 'config' }, c)); };
+  const set = (patch) => {
+    const c = Object.assign({ players: S.expected, rounds: S.rounds, timer: S.timerOn }, patch);
+    c.players = Math.max(Math.max(3, n), Math.min(MAXP(), c.players)); c.rounds = Math.max(3, Math.min(c.rounds, c.players));
+    // optimistic: update locally right away, server confirms
+    S.expected = c.players; S.rounds = c.rounds; S.timerOn = c.timer; cfg = c; LS.set('pw_cfg', cfg); send(Object.assign({ t: 'config' }, c)); render();
+  };
   const [pre, post] = t('join_at', { url: '\u0000' }).split('\u0000');
-  const rows = S.players.map((p) => h('div', { class: 'prow' + (p.connected ? '' : ' off') }, avatar(p.hue, p.connected ? '' : 'off'), h('span', { class: 'n' }, p.name), ic('check'),
-    h('button', { class: 'kick', 'aria-label': t('kick') + ' ' + p.name, onclick: () => send({ t: 'kick', id: p.id }) }, ic('close'))));
-  for (let i = n; i < S.expected; i++) rows.push(h('div', { class: 'empty-seat' }, h('span', { class: 'avatar-slot' }), t('empty_seat')));
-  mount(h('main', { class: 'screen' },
+  const rows = S.players.map((p) => h('div', { class: 'prow' + (p.connected ? '' : ' off'), 'data-k': p.id }, avatar(p.hue, p.connected ? '' : 'off'), h('span', { class: 'n' }, p.name), ic('check'),
+    h('button', { class: 'kick', 'aria-label': t('kick') + ' ' + p.name, onclick: act({ t: 'kick', id: p.id }) }, ic('close'))));
+  const seats = S.expected - n, showSeats = Math.min(seats, Math.max(0, 8 - n));
+  for (let i = 0; i < showSeats; i++) rows.push(h('div', { class: 'empty-seat', 'data-k': 'seat' + i }, h('span', { class: 'avatar-slot' }), t('empty_seat')));
+  if (seats > showSeats) rows.push(h('div', { class: 'empty-seat more', 'data-k': 'more' }, t('more_seats', { n: seats - showSeats })));
+  mount('lobby', h('main', { class: 'screen' },
     h('div', { class: 'hdr' }, ic('crown'), h('h2', null, t('lobby'))),
     h('div', { class: 'lobby' },
       h('div', { class: 'left' },
@@ -417,30 +484,31 @@ function lobbyView() {
         h('p', { class: 'join-text' }, pre, h('b', null, shown), post),
         h('div', { class: 'qrwrap' }, qrBox(joinUrl), h('span', { class: 'small muted' }, t('scan'))),
         h('div', { class: 'settings' },
-          stepper(t('players'), S.expected, Math.max(3, n), 12, (v) => set({ players: v })),
-          stepper(t('rounds'), S.rounds, 3, S.expected, (v) => set({ rounds: v })),
+          stepper(t('players'), S.expected, Math.max(3, n), MAXP(), (d) => set({ players: S.expected + d })),
+          stepper(t('rounds'), S.rounds, 3, S.expected, (d) => set({ rounds: S.rounds + d })),
           toggle(t('timer'), S.timerOn, (v) => set({ timer: v })))),
       h('div', { class: 'players-panel' },
         h('h3', { 'aria-live': 'polite' }, t('n_players', { n, max: S.expected })),
-        h('div', { class: 'plist' + (S.expected > 8 ? ' two' : '') }, rows),
-        h('button', { class: 'btn primary big block', disabled: n < 3, onclick: () => send({ t: 'start' }) }, n < 3 ? t('need_more') : [ic('play'), t('start')])))));
+        h('div', { class: 'plist' + (n > 16 ? ' three' : n > 8 ? ' two' : '') }, rows),
+        h('button', { class: 'btn primary big block', disabled: n < 3, onclick: act({ t: 'start' }) }, n < 3 ? t('need_more') : [ic('play'), t('start')]),
+        h('button', { class: 'btn danger-outline block', onclick: () => closeRoom(false) }, ic('close'), t('cancel_room'))))));
 }
 function roundView() {
   const type = S.round === 0 ? 'prompt' : S.round % 2 ? 'image' : 'guess';
   const done = S.players.filter((p) => p.done).length;
-  mount(h('main', { class: 'screen round' },
+  mount('round'+S.round, h('main', { class: 'screen round' },
     h('h2', null, t('round_of', { r: S.round + 1, R: S.rounds })),
     timerPill(),
     h('p', { class: 'instr' }, t('i_' + type)),
-    h('div', { class: 'pgrid', role: 'list', 'aria-label': t('progress_label') }, S.players.map((p) =>
-      h('div', { class: 'pstat ' + (p.done ? 'done' : p.connected ? 'work' : 'lost'), role: 'listitem' },
+    h('div', { class: 'pgrid' + (S.players.length > 12 ? ' many' : ''), role: 'list', 'aria-label': t('progress_label') }, S.players.map((p) =>
+      h('div', { class: 'pstat ' + (p.done ? 'done' : p.connected ? 'work' : 'lost'), role: 'listitem', 'data-k': p.id },
         avatar(p.hue, p.connected ? '' : 'off'), h('span', { class: 'n' }, p.name),
         h('span', { class: 'st' }, p.done ? [t('done'), ic('check')] : p.connected ? t('working') : [ic('warn'), t('disconnected')])))),
     h('div', { class: 'foot' },
       h('div', { class: 'progress' },
         h('div', { class: 'bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(S.players.length), 'aria-valuenow': String(done), 'aria-label': t('progress_label') }, h('i', { style: `width:${(done / S.players.length) * 100}%` })),
         h('span', { class: 'count' }, t('n_done', { n: done, N: S.players.length }))),
-      h('button', { class: 'btn secondary', onclick: () => send({ t: 'skip' }) }, t('skip')))));
+      h('div', { class: 'row center' }, h('button', { class: 'btn secondary', onclick: act({ t: 'skip' }) }, t('skip')), endBtn()))));
 }
 
 // ---- reveal: 3 even slots (board §5), window slides as the chain grows
@@ -458,13 +526,13 @@ function drawReveal(opts = {}) {
   }
   const dots = h('span', { class: 'dots', 'aria-hidden': 'true' }, S.chains.map((_, i) => h('i', { class: i === rv.c ? 'on' : i < rv.c ? 'done' : '' })));
   const stage = h('div', { class: 'stage', 'aria-live': 'polite' }, confetti(4), h('span', { class: 'star solid twinkle', 'aria-hidden': 'true' }), kids);
-  mount(h('main', { class: 'screen reveal' },
+  mount('reveal', h('main', { class: 'screen reveal' }, endBtn(),
     h('div', { class: 'title-center' }, h('h2', null, t('chain_of', { c: rv.c + 1, C })), dots, h('span', { class: 'small muted' }, t('started_by', { name: chain.owner }))),
     stage,
     h('div', { class: 'controls' },
       h('button', { class: 'btn icon', 'aria-label': t('prev_step'), disabled: rv.busy || (rv.c === 0 && rv.s === 0), onclick: revealPrev }, ic('back')),
       h('button', { class: 'btn primary big', disabled: rv.busy, onclick: revealNext }, last ? (lastChain ? t('see_results') : t('next_chain')) : t('next_step'), ic('play'))),
-    h('p', { class: 'keys' }, t('reveal_keys'))));
+    h('p', { class: 'keys' }, t('reveal_keys'))), { fresh: true });
   const tw = stage.querySelector('.type-me'); if (tw) typewriter(tw);
 }
 function revealNext() {
@@ -476,8 +544,8 @@ function revealNext() {
     setTimeout(() => { rv.busy = false; drawReveal({ enter: true }); }, 900); // slow drumroll
   } else if (rv.c < S.chains.length - 1) {
     rv.c++; rv.s = 0; drawReveal({ enter: true });
-  } else {
-    send({ t: 'reveal_done' });
+  } else if (send({ t: 'reveal_done' })) {
+    pending(document.querySelector('.reveal .btn.primary'));
   }
 }
 function revealPrev() {
@@ -499,19 +567,19 @@ function boardRows(board) {
 function resultsView() {
   const board = (S.score && S.score.board) || [];
   const drift = S.score && S.score.drift;
-  mount(h('main', { class: 'screen results' },
+  mount('results', h('main', { class: 'screen results' },
     h('div', { class: 'title-center' }, h('h2', null, ic('crown'), t('results'), ic('crown'))),
     h('div', { class: 'results-grid' },
       h('div', { class: 'board' }, boardRows(board)),
       h('div', { class: 'col' },
         drift != null ? h('div', { class: 'statcard' }, h('b', null, drift + '%'), h('span', null, t('drift', { n: drift }))) : null,
         h('div', { class: 'btns' },
-          h('button', { class: 'btn primary big', onclick: () => send({ t: 'again' }) }, t('play_again')),
-          h('button', { class: 'btn outline big', onclick: () => { resetSession('host'); render(); } }, t('new_game'))),
+          h('button', { class: 'btn primary big', onclick: act({ t: 'again' }) }, t('play_again')),
+          h('button', { class: 'btn outline big', onclick: (e) => { if (send({ t: 'close' })) pending(e.currentTarget); else { resetSession('host'); render(); } } }, t('new_game'))),
         h('button', { class: 'btn ghost', onclick: () => { V2 = 'review'; render(); } }, t('review'))))));
 }
 function reviewView() {
-  mount(h('main', { class: 'screen' },
+  mount('review', h('main', { class: 'screen' },
     h('div', { class: 'hdr' }, h('h2', null, t('review')), h('span', { class: 'grow' }), h('button', { class: 'btn secondary', onclick: () => { V2 = null; render(); } }, ic('back'), t('back'))),
     h('div', { class: 'scroll-y' }, S.chains.map((c, i) => h('div', { class: 'chain-block' }, h('h3', null, t('chain_of', { c: i + 1, C: S.chains.length }) + ' · ' + t('started_by', { name: c.owner })), chainStrip(c))))));
 }
@@ -548,7 +616,7 @@ function taskView() {
          h('button', { class: 'btn secondary block', onclick: () => { const s = t('sugg'); field.value = draft.text = s[Math.floor(Math.random() * s.length)]; field.dispatchEvent(new Event('input')); } }, ic('dice'), t('surprise'))]
       : [h('h2', { class: 'ptitle' }, t('guess_title')),
          task.input && task.input.img ? h('img', { class: 'guessimg', src: apiUrl(task.input.img), alt: '' }) : h('div', { class: 'noimg' }, ic('image'), t('no_image')), field, cnt];
-    mount(h('main', { class: 'screen task' }, head, h('div', { class: 'fill' }, body), btn));
+    mount('task'+S.round, h('main', { class: 'screen task' }, head, h('div', { class: 'fill' }, body), btn), { fresh: true });
     return;
   }
 
@@ -559,26 +627,26 @@ function taskView() {
   const dzIcon = ic('image');
   const take = async (file) => {
     if (!file || !/^image\//.test(file.type)) return;
-    try { draft.img = await fileToJpeg(file); preview.src = draft.img; preview.hidden = false; dzIcon.hidden = true; btn.disabled = draft.busy; }
+    try { draft.img = await fileToJpeg(file); preview.src = draft.img; preview.hidden = false; dzIcon.hidden = true; dz.classList.add('has-img'); btn.disabled = draft.busy; btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
     catch { toast(t('e_img'), 'error'); }
   };
   if (draft.img) dzIcon.hidden = true;
   const mkInput = (cap) => h('input', { type: 'file', accept: 'image/*', capture: cap, hidden: true, onchange: (e) => { take(e.target.files[0]); e.target.value = ''; } });
   const cam = mkInput('environment'), gal = mkInput(null);
-  const dz = h('div', { class: 'dropzone', ondragover: (e) => { e.preventDefault(); dz.classList.add('over'); }, ondragleave: () => dz.classList.remove('over'),
+  const dz = h('div', { class: 'dropzone' + (draft.img ? ' has-img' : ''), ondragover: (e) => { e.preventDefault(); dz.classList.add('over'); }, ondragleave: () => dz.classList.remove('over'),
     ondrop: (e) => { e.preventDefault(); dz.classList.remove('over'); take(e.dataTransfer.files[0]); } },
     dzIcon, preview, h('span', { class: 'dz-text' }, t('drop')),
     h('div', { class: 'row' },
       h('button', { class: 'btn secondary', onclick: () => cam.click() }, ic('camera'), t('camera')),
       h('button', { class: 'btn secondary', onclick: () => gal.click() }, ic('image'), t('gallery'))), cam, gal);
   pasteHandler = (e) => { const f = [...(e.clipboardData ? e.clipboardData.files : [])][0]; if (f) take(f); };
-  mount(h('main', { class: 'screen task' }, head,
+  mount('task'+S.round, h('main', { class: 'screen task' }, head,
     h('div', { class: 'fill' },
       h('h2', { class: 'ptitle' }, t('gen_image')),
       inp.text ? [h('p', { class: 'useprompt' }, t('use_prompt')), h('div', { class: 'promptbox' }, inp.text),
         h('button', { class: 'btn secondary block', onclick: () => copyText(inp.text) }, ic('copy'), t('copy_prompt'))]
         : h('div', { class: 'noimg', style: 'aspect-ratio:auto;padding:16px' }, t('skipped_in')),
-      dz), btn));
+      dz), btn), { fresh: true });
 }
 let pasteHandler = null;
 document.addEventListener('paste', (e) => { if (pasteHandler) pasteHandler(e); });
@@ -592,23 +660,23 @@ function playerView() {
   }
   lastKey = null; pasteHandler = null;
   if (ph === 'lobby') {
-    mount(h('main', { class: 'screen mid' },
+    mount('p-lobby', h('main', { class: 'screen mid' },
       h('div', { class: 'milestone' }, h('div', { class: 'hourglass', 'aria-hidden': 'true' }, h('span', { class: 'glass' }), h('span', { class: 'rim' }))),
       h('h2', null, t('youre_in')), h('p', { class: 'muted' }, t('waiting_start')),
       h('div', { class: 'avatars-row' }, S.players.map((p) => avatar(p.hue, 'lg' + (p.connected ? '' : ' off')))),
       h('span', { class: 'pill me-pill' }, avatar(S.me.hue), S.me.name)));
   } else if (ph === 'round') {
-    mount(h('main', { class: 'screen mid' },
+    mount('p-done'+S.round, h('main', { class: 'screen mid' },
       h('div', { class: 'milestone' }, confetti(6), h('div', { class: 'bigcheck', role: 'img', 'aria-label': t('done') })),
       h('h2', null, t('all_set')), h('p', { class: 'muted' }, t('waiting_others')), timerPill()));
   } else if (ph === 'reveal') {
-    mount(h('main', { class: 'screen mid' },
+    mount('p-reveal', h('main', { class: 'screen mid' },
       h('div', { class: 'milestone' }, h('div', { class: 'eyes', 'aria-hidden': 'true' }, h('i'), h('i'))),
       h('h2', null, t('look_tv')), h('p', { class: 'muted' }, t('look_tv_sub'))));
   } else if (ph === 'end') {
     const board = (S.score && S.score.board) || [];
     const me = board.find((p) => p.name === S.me.name);
-    mount(h('main', { class: 'screen mid' },
+    mount('p-end', h('main', { class: 'screen mid' },
       h('div', { class: 'milestone' }, confetti(6), h('div', { class: 'trophy', role: 'img', 'aria-label': t('game_over') }, h('span', { class: 'h l' }), h('span', { class: 'h r' }), h('span', { class: 'cup' }), h('span', { class: 'stem' }), h('span', { class: 'base' }))),
       h('h2', null, t('game_over')), h('p', null, t('hilarious')),
       me ? h('span', { class: 'pill me-pill' }, avatar(S.me.hue), t('your_pts', { n: me.pts })) : null,
@@ -637,6 +705,8 @@ function render() {
   if (V === 'join') return joinView();
   return landingView();
 }
+
+let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { const before = document.body.className; setBodyClass(); if (document.body.className !== before) { viewKey = null; lastKey = null; render(); } }, 200); });
 
 if (previewOnly) online = true;
 else connect();

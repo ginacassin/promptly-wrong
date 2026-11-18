@@ -76,6 +76,11 @@ class RedisStore {
     }
   }
 
+  async delete(code) {
+    await this.c.multi().del(this.key(code)).zRem(DEADLINES, code).exec();
+    // images expire with their TTL
+  }
+
   async due(now) {
     return this.c.zRangeByScore(DEADLINES, 0, now);
   }

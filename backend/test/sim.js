@@ -114,6 +114,24 @@ async function memoryTests() {
   ps[1].send({ t: 'submit', data: 'not an image' });
   assert.equal((await ps[1].until((m) => m.t === 'error')).code, 'bad_image');
   console.log('  ✓ skip / late join / validation');
+
+  // cancel room: host closes, every player is told and the room is gone
+  host.send({ t: 'close' });
+  for (const p of ps) assert.equal((await p.until((m) => m.t === 'error' && m.code === 'room_closed')).code, 'room_closed');
+  const again = client(3901); await again.open; again.send({ t: 'join', code, name: 'zz' });
+  assert.equal((await again.until((m) => m.t === 'error')).code, 'no_room');
+  console.log('  ✓ cancel room notifies everyone');
+
+  // more than 12 players
+  const big = client(3901); await big.open;
+  big.send({ t: 'host_create', players: 20, rounds: 3, timer: false });
+  const bcode = (await big.until((m) => m.t === 'host_ok')).code;
+  assert.equal((await big.until((m) => m.t === 'host_state')).expected, 20);
+  for (let i = 0; i < 20; i++) { const p = client(3901); await p.open; p.send({ t: 'join', code: bcode, name: 'B' + i }); await p.until((m) => m.t === 'join_ok'); }
+  await big.until((m) => m.t === 'host_state' && m.players.length === 20);
+  big.send({ t: 'start' });
+  await big.until((m) => m.t === 'host_state' && m.phase === 'round' && m.N === 20);
+  console.log('  ✓ 20-player room');
 }
 
 async function redisTests() {
@@ -156,6 +174,15 @@ async function redisTests() {
   assert.equal(st.me.name, 'T1');
   assert.equal(st.round, 1);
   console.log('  ✓ failover reconnect keeps the seat');
+
+  // cancel from replica A reaches a player on replica A (B is down) and the room is deleted in Redis
+  host.ws.terminate();
+  const h2 = client(3911); await h2.open;
+  h2.send({ t: 'host_resume', code, token: host.msgs.find((m) => m.t === 'host_ok').token });
+  await h2.until((m) => m.t === 'host_ok');
+  h2.send({ t: 'close' });
+  assert.equal((await back.until((m) => m.t === 'error' && m.code === 'room_closed')).code, 'room_closed');
+  console.log('  ✓ cancel room across replicas');
 }
 
 (async () => {

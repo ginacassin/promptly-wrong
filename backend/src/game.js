@@ -5,7 +5,8 @@
  */
 const crypto = require('crypto');
 
-const MAX_PLAYERS = 12;
+// Hard ceiling per room; override with MAX_PLAYERS env (1 room = 1 shared screen, so keep it sane).
+const MAX_PLAYERS = Math.max(3, Math.min(100, Number(process.env.MAX_PLAYERS) || 30));
 const MIN_PLAYERS = 3;
 const MIN_ROUNDS = 3;
 const MAX_TEXT = 120;
@@ -228,6 +229,7 @@ function hostView(room, now) {
     round: room.round,
     N: room.N,
     timerOn: room.timerOn,
+    maxPlayers: MAX_PLAYERS,
     timeLeft: timeLeft(room, now),
     players: room.players.map((p) => ({ id: p.id, name: p.name, hue: hueOf(room, p.id), connected: !!p.online, done: done && room.subs.includes(p.id) })),
     chains: room.phase === 'reveal' || room.phase === 'end' ? serChains(room) : null,
