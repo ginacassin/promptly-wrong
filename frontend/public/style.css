@@ -707,3 +707,200 @@ body.phone .wrap-actions .btn { width: 100%; }
 body.phone .full-hint { font-size: 13px; }
 .milestone.small { width: 90px; height: 90px; margin-bottom: 0; }
 .milestone.small .hourglass { transform-origin: center; scale: .7; }
+
+/* ================= TWISTS (ported from the approved board, em-based) ================= */
+:root { --pink: var(--color-primary); --lime: var(--color-accent); --cyan: var(--color-info); --yellow: var(--color-warning); --red: var(--color-error); --purple: #B98CFF; --text: var(--color-text); --ui: var(--font-ui); --brand: var(--font-brand); }
+/* the AI image stand-in (CSS scene) */
+.scene { position: relative; overflow: hidden; border-radius: 1em; background: linear-gradient(180deg, #7BC6FF 0%, #B9E4FF 46%, #FFE9A8 60%, #8FD46B 61%, #4FAF5A 100%); }
+.scene::before { content: ''; position: absolute; width: 22%; aspect-ratio: 1; border-radius: 50%; right: 14%; top: 10%; background: radial-gradient(circle, #FFF6B0 0 45%, #FFD84D 60%, rgba(255,216,77,0) 72%); }
+.scene::after { content: ''; position: absolute; left: -5%; right: -5%; bottom: 0; height: 62%; background: #3E8F4D; clip-path: polygon(0 100%, 0 60%, 18% 30%, 34% 55%, 52% 18%, 70% 52%, 86% 34%, 100% 58%, 100% 100%); opacity: .85; }
+/* ============ TWIST SYSTEM ============ */
+/* twist chip (used on TV, phones, reveal, PDF) */
+.tchip { display: inline-flex; align-items: center; gap: 0.5em; padding: 0.375em 0.75em 0.375em 0.375em; border-radius: 62.4375em; font: 800 0.8125em var(--ui); color: var(--ink); background: var(--tc); box-shadow: 0 0 0.875em color-mix(in srgb, var(--tc) 50%, transparent); }
+.tchip .ti { width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--ink); display: grid; place-items: center; }
+.t-glimpse { --tc: var(--cyan); } .t-peep { --tc: var(--yellow); } .t-tv { --tc: var(--pink); } .t-mem { --tc: var(--lime); } .t-words { --tc: var(--purple); }
+
+/* big twist card */
+.tcard { position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.875em; padding: 1.625em 1.5em 1.5em; border-radius: 1.75em; text-align: center;
+  background: linear-gradient(165deg, color-mix(in srgb, var(--tc) 22%, #1F1547), #150F33 70%); border: 0.125em solid color-mix(in srgb, var(--tc) 70%, transparent);
+  box-shadow: 0 0 0 0.375em color-mix(in srgb, var(--tc) 12%, transparent), 0 0 2.5em color-mix(in srgb, var(--tc) 30%, transparent), 0 0.875em 1.875em rgba(0,0,0,.4); }
+.tcard .tname { font: 900 1.875em/1 var(--brand); letter-spacing: -.02em; color: var(--tc); text-shadow: 0 0 1.125em color-mix(in srgb, var(--tc) 55%, transparent); }
+.tcard .tdesc { font: 600 0.9375em/1.4 var(--ui); color: var(--text); max-width: 26ch; }
+.tcard .twhen { font: 800 0.6875em var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.ill { position: relative; width: 11.875em; height: 8.75em; display: grid; place-items: center; }
+
+/* Glimpse: blinking eye + stopwatch */
+.eye { position: relative; width: 9.375em; height: 5.125em; border-radius: 50% / 50%; background: var(--text); overflow: hidden; clip-path: ellipse(50% 50% at 50% 50%); box-shadow: 0 0 1.375em rgba(73,230,255,.5); }
+.eye::before { content: ''; position: absolute; left: 50%; top: 50%; width: 3.5em; height: 3.5em; margin: -1.75em; border-radius: 50%; background: radial-gradient(circle, #0B0A1A 0 34%, var(--cyan) 36% 70%, #1E8FA8 72%); }
+.eye::after { content: ''; position: absolute; left: 58%; top: 30%; width: 0.75em; height: 0.75em; border-radius: 50%; background: #fff; }
+.lid { position: absolute; left: 0; right: 0; height: 52%; background: #2A1D5C; z-index: 2; animation: blinkT 2.6s ease-in-out infinite; }
+.lid.t { top: 0; transform-origin: top; } .lid.b { bottom: 0; transform-origin: bottom; animation-name: blinkB; }
+@keyframes blinkT { 0%, 70%, 100% { transform: scaleY(0); } 80%, 88% { transform: scaleY(1); } }
+@keyframes blinkB { 0%, 70%, 100% { transform: scaleY(0); } 80%, 88% { transform: scaleY(1); } }
+.watch { position: absolute; right: 0.125em; bottom: 0; display: grid; place-items: center; width: 3.25em; height: 3.25em; border-radius: 50%; background: var(--ink); border: 0.25em solid var(--cyan); color: var(--cyan); font: 900 1.125em var(--brand); }
+.watch::before { content: ''; position: absolute; top: -0.75em; width: 0.875em; height: 0.5em; border-radius: 0.1875em; background: var(--cyan); }
+
+/* Peephole: spotlight wandering over a dark image */
+.peep { position: relative; width: 11.25em; height: 8em; border-radius: 1em; overflow: hidden; border: 0.1875em solid var(--yellow); }
+.peep .scene { position: absolute; inset: 0; border-radius: 0; }
+.peep .dark { position: absolute; inset: 0; background: radial-gradient(circle 2.125em at var(--x, 35%) var(--y, 40%), transparent 0 96%, #0B0A1A 100%); animation: wander 6s ease-in-out infinite; }
+@property --x { syntax: '<percentage>'; inherits: false; initial-value: 35%; }
+@property --y { syntax: '<percentage>'; inherits: false; initial-value: 40%; }
+@keyframes wander { 0% { --x: 25%; --y: 35%; } 25% { --x: 70%; --y: 30%; } 50% { --x: 60%; --y: 72%; } 75% { --x: 30%; --y: 65%; } 100% { --x: 25%; --y: 35%; } }
+.peep .ring { position: absolute; inset: 0; background: radial-gradient(circle 2.3125em at var(--x, 35%) var(--y, 40%), transparent 0 88%, var(--yellow) 90% 96%, transparent 100%); animation: wander 6s ease-in-out infinite; }
+
+/* Bad TV: CRT with static */
+.crt { position: relative; width: 10.625em; height: 7.75em; border-radius: 1.375em; background: #3A2A7A; border: 0.25em solid var(--pink); display: grid; grid-template-columns: 1fr 2.125em; gap: 0.5em; padding: 0.75em; box-shadow: 0 0 1.375em rgba(255,79,163,.45); }
+.crt::before, .crt::after { content: ''; position: absolute; top: -1.875em; width: 0.25em; height: 2.125em; background: var(--pink); border-radius: 0.125em; }
+.crt::before { left: 3.5em; transform: rotate(-28deg); } .crt::after { left: 5.125em; transform: rotate(28deg); }
+.crt .screen { position: relative; border-radius: 0.75em; overflow: hidden;
+  background: repeating-conic-gradient(#F4F3FF 0 25%, #4A4566 0 50%) 0 0/0.5em 0.5em, #888; animation: noise .3s steps(3) infinite; }
+.crt .screen::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(11,10,26,.55) 0 0.125em, transparent 0.125em 0.3125em); }
+.crt .screen::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(255,79,163,.45), transparent 40%, rgba(73,230,255,.45)); mix-blend-mode: screen; z-index: 1; }
+@keyframes noise { 0% { background-position: 0 0; } 33% { background-position: 0.25em 0.125em; } 66% { background-position: -0.1875em 0.3125em; } }
+.crt .knobs { display: flex; flex-direction: column; gap: 0.625em; align-items: center; padding-top: 0.375em; }
+.crt .knobs i { width: 1.25em; height: 1.25em; border-radius: 50%; background: var(--ink); border: 0.1875em solid var(--pink); }
+
+/* Memory mode: bubble dissolving */
+.memo { position: relative; width: 11.5em; }
+.memo .tw-bubble { font-size: 0.9375em; width: 100%; }
+.memo .fade span { animation: forget 3.2s ease-in-out infinite; display: inline-block; }
+.memo .fade span:nth-child(2) { animation-delay: .25s; } .memo .fade span:nth-child(3) { animation-delay: .5s; } .memo .fade span:nth-child(4) { animation-delay: .75s; }
+@keyframes forget { 0%, 20% { opacity: 1; filter: blur(0); transform: none; } 60%, 100% { opacity: .12; filter: blur(0.1875em); transform: translateY(-0.25em); } }
+.memo .bar { margin-top: 1.25em; height: 0.5em; border-radius: 0.25em; background: #3A2F66; overflow: hidden; }
+.memo .bar i { display: block; height: 100%; width: 100%; background: var(--lime); transform-origin: left; animation: drain 3.2s linear infinite; }
+@keyframes drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.memo .sec { position: absolute; right: -0.625em; top: -1em; display: grid; place-items: center; width: 2.5em; height: 2.5em; border-radius: 50%; background: var(--lime); color: var(--ink); font: 900 1.0625em var(--brand); box-shadow: 0 0 0.875em rgba(200,255,61,.6); }
+
+/* Word limit: five slots, sixth cut */
+.slots { display: flex; flex-wrap: wrap; gap: 0.375em; justify-content: center; width: 11.875em; }
+.slots i { display: grid; place-items: center; height: 1.875em; padding: 0 0.625em; border-radius: 0.5em; background: var(--purple); color: var(--ink); font: 800 0.8125em var(--ui); font-style: normal; }
+.slots i.empty { background: transparent; border: 0.125em dashed rgba(185,140,255,.7); color: transparent; width: 2.875em; }
+.slots i.cut { background: rgba(255,59,92,.15); color: var(--red); border: 0.125em solid var(--red); text-decoration: line-through; }
+.scissors { font: 900 0.8125em var(--brand); color: var(--purple); letter-spacing: .1em; margin-top: 0.5em; }
+
+/* small CSS icons inside chips */
+.mi { position: relative; display: block; width: 0.875em; height: 0.875em; }
+.mi.eye-i { width: 1em; height: 0.625em; border-radius: 50%; background: var(--tc); }
+.mi.eye-i::after { content: ''; position: absolute; left: 0.3125em; top: 0.125em; width: 0.375em; height: 0.375em; border-radius: 50%; background: var(--ink); }
+.mi.peep-i { border-radius: 50%; border: 0.1875em solid var(--tc); }
+.mi.tv-i { width: 1em; height: 0.75em; border-radius: 0.1875em; border: 0.1562em solid var(--tc); background: repeating-linear-gradient(0deg, var(--tc) 0 0.0625em, transparent 0.0625em 0.1875em); }
+.mi.mem-i { width: 1em; height: 0.75em; border-radius: 0.25em; background: var(--tc); }
+.mi.mem-i::after { content: ''; position: absolute; left: 0.125em; bottom: -0.25em; width: 0.375em; height: 0.3125em; background: var(--tc); clip-path: polygon(0 0, 100% 0, 0 100%); }
+.mi.words-i { width: 1em; height: 0.25em; border-radius: 0.125em; background: var(--tc); box-shadow: 0 0.3125em 0 var(--tc), 0 -0.3125em 0 var(--tc); }
+
+/* phone states for the twists */
+.glimpse-wait { position: relative; aspect-ratio: 4/3; border-radius: 1em; background: repeating-linear-gradient(45deg, #241A55 0 0.875em, #2C2066 0.875em 1.75em); border: 0.1875em dashed var(--cyan); display: grid; place-items: center; }
+.ringtimer { position: absolute; right: 0.625em; top: 0.625em; display: grid; place-items: center; width: 3.375em; height: 3.375em; border-radius: 50%; background: conic-gradient(var(--cyan) 0 70%, rgba(11,10,26,.75) 0); }
+.ringtimer::after { content: '3'; display: grid; place-items: center; width: 2.625em; height: 2.625em; border-radius: 50%; background: var(--ink); color: var(--cyan); font: 900 1.25em var(--brand); }
+.gone { position: relative; aspect-ratio: 4/3; border-radius: 1em; overflow: hidden; border: 0.1875em solid #5A4F8A; }
+.gone .scene { position: absolute; inset: 0; filter: blur(1em) brightness(.45) saturate(.4); transform: scale(1.1); }
+.gone .msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; font: 900 1.625em/1.1 var(--brand); }
+.pix { position: relative; aspect-ratio: 4/3; border-radius: 1em; overflow: hidden; border: 0.1875em solid var(--pink); }
+.pix .scene { position: absolute; inset: 0; border-radius: 0; }
+.pix .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(11,10,26,.0) 0, rgba(11,10,26,0) 100%); backdrop-filter: blur(var(--b, 0.625em)) grayscale(var(--g, 0)); }
+.pix .scan { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(11,10,26,.35) 0 0.125em, transparent 0.125em 0.3125em); }
+.pix .mosaic { position: absolute; inset: 0; background-size: var(--m, 1.75em) var(--m, 1.75em); background-image: linear-gradient(90deg, rgba(11,10,26,.18) 0.0625em, transparent 0.0625em), linear-gradient(rgba(11,10,26,.18) 0.0625em, transparent 0.0625em); }
+.signal { display: flex; align-items: flex-end; gap: 0.1875em; height: 1em; }
+.signal i { width: 0.3125em; background: var(--pink); border-radius: 0.125em; }
+.signal i.off { background: #4A4566; }
+.mirror .scene { transform: scaleX(-1); }
+
+/* word counter chips */
+.wordrow { display: flex; gap: 0.375em; flex-wrap: wrap; }
+.wordrow i { font-style: normal; padding: 0.375em 0.625em; border-radius: 0.5em; background: var(--purple); color: var(--ink); font: 800 0.875em var(--ui); }
+.wordrow i.empty { background: transparent; border: 0.125em dashed rgba(185,140,255,.6); width: 2.75em; }
+
+/* "TWIST!" stamp */
+.tw-stamp { display: inline-block; padding: 0.375em 1.125em; border: 0.25em solid var(--pink); border-radius: 0.75em; color: var(--pink); font: 900 2.125em/1 var(--brand); letter-spacing: .04em; transform: rotate(-8deg); box-shadow: 0 0 1.5em rgba(255,79,163,.45), inset 0 0 0 0.1875em rgba(255,79,163,.35); background: rgba(11,10,26,.5); }
+
+
+/* game integration */
+.tcard .tdesc b { font-weight: 900; color: var(--tc); }
+.tw-bubble { position: relative; display: grid; place-items: center; padding: .7em .9em; border-radius: .9em; background: var(--color-text); color: var(--ink); font: 800 1em/1.25 var(--font-ui); text-align: center; box-shadow: .25em .3em 0 rgba(0,0,0,.35); }
+.tw-bubble::after { content: ''; position: absolute; left: 1.2em; bottom: -.8em; width: 1.3em; height: .85em; background: inherit; clip-path: polygon(0 0, 100% 0, 10% 100%); }
+.scene.mini { position: absolute; inset: 0; border-radius: 0; }
+
+/* TV intro + round panel */
+.twist-intro { align-items: center; text-align: center; justify-content: center; gap: .6em; }
+.twist-intro .stage-card { position: relative; display: flex; align-items: center; justify-content: center; flex: 1; width: 100%; }
+.twist-intro .tcard { font-size: 1.05em; width: 15.5em; animation: cardIn .7s cubic-bezier(.2,1.4,.4,1) both .25s; }
+.twist-intro .tcard .ill { scale: 1.3; margin: .6em 0 .5em; }
+.twist-intro .tw-stamp { position: absolute; left: calc(50% - 10.5em); top: .2em; font-size: 1.4em; z-index: 3; animation: stampIn .35s cubic-bezier(.2,1.2,.4,1) both; }
+.twist-intro .getready { width: 8em; height: .3em; border-radius: .2em; background: #3A2F66; overflow: hidden; }
+.twist-intro .getready i { display: block; height: 100%; background: var(--color-text); animation: drainR 4.8s linear both; transform-origin: left; }
+@keyframes drainR { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@keyframes cardIn { 0% { opacity: 0; transform: scale(.6) rotate(-6deg); } 60% { opacity: 1; transform: scale(1.05) rotate(1deg); } 100% { transform: none; } }
+@keyframes stampIn { 0% { opacity: 0; transform: scale(2.4) rotate(-8deg); } 100% { opacity: 1; transform: rotate(-8deg); } }
+.round-body { display: grid; grid-template-columns: 11em minmax(0, 1fr); gap: 1.4em; width: 100%; align-items: center; }
+.round-body .tcard { font-size: .62em; padding: 1.2em 1.1em 1.3em; }
+.round-body.plain { grid-template-columns: minmax(0, 1fr); }
+body.phone .round-body { grid-template-columns: 1fr; }
+body.phone .round-body .tcard { font-size: 14px; }
+
+/* phone notice */
+.tw-notice { align-items: center; text-align: center; }
+.tw-notice .tw-stamp { font-size: 26px; margin-top: 10px; }
+.tw-notice .tcard { width: 100%; font-size: 16px; padding: 22px 18px; }
+.tw-notice > .btn.primary { margin-top: auto; }
+.tw-inline { font-size: 11px; vertical-align: middle; margin-left: 4px; }
+.tw-inline .ti { width: 18px; height: 18px; }
+
+/* Glimpse on the phone */
+.glimpse-box { position: relative; width: 100%; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); overflow: hidden; border: 3px solid var(--color-info); background: #241A55; box-shadow: 0 0 1em rgba(73,230,255,.3); }
+.glimpse-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.glimpse-box .ringtimer { font-size: 16px; }
+.glimpse-box .ringtimer::after { content: attr(data-n); }
+.glimpse-box.gone { border-color: #5A4F8A; box-shadow: none; }
+.glimpse-box.gone img { filter: blur(18px) brightness(.45) saturate(.4); transform: scale(1.15); }
+.glimpse-box .msg { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 4px; font: 900 26px/1.1 var(--font-brand); }
+.glimpse-box .msg span { font: 600 14px var(--font-ui); color: var(--muted); }
+
+/* Peephole on the phone */
+.peep.big { width: 100%; height: auto; aspect-ratio: 4 / 3; border-width: 4px; font-size: 16px; }
+.peep.big img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.peep.big .dark { background: radial-gradient(circle 4em at var(--x, 35%) var(--y, 40%), transparent 0 96%, #0B0A1A 100%); animation: wander 9s ease-in-out infinite; }
+.peep.big .ring { background: radial-gradient(circle 4.25em at var(--x, 35%) var(--y, 40%), transparent 0 90%, var(--yellow) 92% 97%, transparent 100%); animation: wander 9s ease-in-out infinite; }
+
+/* Bad TV on the phone */
+.tvbox { position: relative; width: 100%; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); overflow: hidden; border: 3px solid var(--color-primary); background: #241A55; box-shadow: 0 0 1em rgba(255,79,163,.3); }
+.tvbox canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+.tvbox.mirror canvas { transform: scaleX(-1); }
+.tvbox .scan { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(11,10,26,.35) 0 2px, transparent 2px 5px); }
+.tvbox .rgb { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(255,79,163,.18), transparent 40%, rgba(73,230,255,.18)); mix-blend-mode: screen; }
+.sigrow { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--muted); }
+.signal { font-size: 16px; }
+
+/* Memory mode on the phone */
+.memo-screen { justify-content: center; gap: 22px; }
+.memo-big { position: relative; }
+.memo-big .tw-bubble { min-height: 150px; font-size: 24px; padding: 18px; }
+.memo-big .sec { position: absolute; right: -8px; top: -18px; z-index: 2; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--lime); color: var(--ink); font: 900 24px var(--font-brand); box-shadow: 0 0 14px rgba(200,255,61,.6); }
+.memo-drain { height: 10px; border-radius: 5px; background: #3A2F66; overflow: hidden; margin-top: 10px; }
+.memo-drain i { display: block; height: 100%; background: var(--lime); box-shadow: 0 0 12px rgba(200,255,61,.6); transform-origin: left; animation: drainR 5s linear both; }
+
+/* Word limit on the phone */
+input.words-full { border-color: var(--purple); box-shadow: 0 0 0 4px rgba(185,140,255,.3); }
+input.shake { animation: shake .35s; }
+@keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+.wordbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.wordrow { font-size: 14px; display: flex; gap: 6px; flex-wrap: wrap; }
+.wordrow i { font-style: normal; padding: 5px 9px; border-radius: 8px; background: var(--purple); color: var(--ink); font: 800 13px var(--font-ui); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wordrow i.empty { background: transparent; border: 2px dashed rgba(185,140,255,.6); width: 38px; }
+.wordbar b { color: var(--purple); white-space: nowrap; }
+.words-hint { font-size: 13px; color: var(--color-warning); font-weight: 700; }
+
+/* reveal / strips */
+.slot .lbl .tchip { font-size: .8em; margin-left: .35em; vertical-align: middle; padding: .2em .55em .2em .2em; }
+.slot .lbl .tchip .ti { width: 1.2em; height: 1.2em; }
+.slot .lbl { overflow: visible; white-space: normal; display: flex; align-items: center; flex-wrap: wrap; gap: .2em; }
+.mem-note { display: flex; flex-direction: column; gap: .2em; padding: .45em .6em; border-radius: .7em; border: .12em dashed var(--lime); background: rgba(200,255,61,.12); font-size: .72em; font-weight: 700; color: var(--color-text); }
+.mem-note small { color: var(--lime); font-weight: 800; font-size: .85em; }
+.mem-note span { font-weight: 800; overflow-wrap: anywhere; }
+.slot.image .cardbox.frame.with-mem { aspect-ratio: 16 / 10; }
+.memo .tw-bubble { font-size: .9375em; width: 100%; padding: .6em .7em; line-height: 1.2; }
+.twist-intro .tcard { font-size: .82em; }
+.twist-intro .tcard .ill { scale: 1.15; margin: .4em 0 .3em; }
+.twist-intro .tw-stamp { left: calc(50% - 9.5em); }
+.memo .tw-bubble { white-space: nowrap; font-size: .78em; }
+.tvbox .scan { background: repeating-linear-gradient(0deg, rgba(11,10,26,.22) 0 2px, transparent 2px 6px); }

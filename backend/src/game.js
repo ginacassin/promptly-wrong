@@ -33,10 +33,18 @@ const cleanText = (s) => String(s || '').replace(/[\u0000-\u0008\u000b-\u001f]/g
 
 // Round r: chain c is handled by player (c + r) % N  <=>  player p handles chain (p - r) mod N.
 // r === 0 prompt (text) · odd r image (from text) · even r >= 2 guess (text, from image)
+// ---- twists: at most one per round, the same for everyone
+const TWISTS = { image: ['memory'], guess: ['glimpse', 'peep', 'tv', 'words'] };
+const TWIST_NONE = 1 / 3; // share of rounds without a twist
+const WORD_LIMIT = 5;
+const TV_FX = ['mirror', 'gray', 'blur'];
+// dev/test only: TWIST_FORCE=glimpse,memory forces the first twist that fits the round
+const FORCE = String(process.env.TWIST_FORCE || '').split(',').map((s) => s.trim()).filter(Boolean);
+
 const outType = (r) => (r === 0 ? 'prompt' : r % 2 === 1 ? 'image' : 'guess');
 const chainOf = (room, p, r) => (((p - r) % room.N) + room.N) % room.N;
 
-function createRoom({ code, players, rounds, timer, tText, tImage }) {
+function createRoom({ code, players, rounds, timer, tText, tImage, twists }) {
   const expected = clamp(players, MIN_PLAYERS, MAX_PLAYERS);
   return {
     v: 1,
@@ -46,7 +54,12 @@ function createRoom({ code, players, rounds, timer, tText, tImage }) {
     expected,
     rounds: Math.min(clamp(rounds, MIN_ROUNDS, MAX_PLAYERS), expected),
     timerOn: timer !== false,
+    twistsOn: true,
+    twist: null,
+    twistLog: [],
+    tvFx: {},
     tText: clamp(tText ?? T_TEXT.def, T_TEXT.min, T_TEXT.max),
+    ...(twists === false ? { twistsOn: false } : {}),
     tImage: clamp(tImage ?? T_IMAGE.def, T_IMAGE.min, T_IMAGE.max),
     deadline: null,
     players: [], // {id, name, token, online, conn}
@@ -90,11 +103,12 @@ function setEmoji(room, playerId, emoji) {
   return true;
 }
 
-function configure(room, { players, rounds, timer, tText, tImage }) {
+function configure(room, { players, rounds, timer, tText, tImage, twists }) {
   if (room.phase !== 'lobby') return false;
   room.expected = clamp(players, Math.max(MIN_PLAYERS, room.players.length), MAX_PLAYERS);
   room.rounds = clamp(rounds, MIN_ROUNDS, MAX_PLAYERS);
   room.timerOn = timer !== false;
+  if (twists != null) room.twistsOn = twists !== false;
   if (tText != null) room.tText = clamp(tText, T_TEXT.min, T_TEXT.max);
   if (tImage != null) room.tImage = clamp(tImage, T_IMAGE.min, T_IMAGE.max);
   return true;
@@ -108,8 +122,34 @@ function kick(room, id) {
   return true;
 }
 
+/** Draw this round's twist: one that fits the round type, or none. Never the same as the previous twist. */
+function drawTwist(room) {
+  const type = outType(room.round);
+  const pool = TWISTS[type] || [];
+  if (room.phase !== 'round' || !room.twistsOn || !pool.length) return null;
+  if (FORCE.length) { const f = FORCE.find((x) => pool.includes(x)); if (f) return f; if (FORCE.includes('none')) return null; }
+  if (Math.random() < TWIST_NONE) return null;
+  // the last twist of this same kind (rounds alternate, so look past the other kind and past 'none')
+  const prev = [...(room.twistLog || [])].reverse().find((t) => t && pool.includes(t));
+  const options = pool.filter((t) => t !== prev);
+  if (!options.length) return null;
+  return options[crypto.randomInt(options.length)];
+}
+
 function startRound(room, now) {
   room.subs = [];
+  room.twist = drawTwist(room);
+  if (!room.twistLog) room.twistLog = [];
+  room.twistLog[room.round] = room.twist;
+  room.tvFx = {};
+  if (room.twist === 'tv') {
+    // each player gets their own mix: always pixelated, plus one or two other effects
+    for (const p of room.players) {
+      const fx = TV_FX.filter(() => Math.random() < 0.5);
+      if (!fx.length) fx.push(TV_FX[crypto.randomInt(TV_FX.length)]);
+      room.tvFx[p.id] = fx;
+    }
+  }
   const secs = outType(room.round) === 'image' ? room.tImage || T_IMAGE.def : room.tText || T_TEXT.def;
   room.deadline = room.phase === 'round' && room.timerOn ? now + secs * SCALE * 1000 : null;
 }
@@ -137,13 +177,19 @@ function submit(room, playerId, payload, now) {
   if (idx < 0) return 'bad_state';
   const r = room.round;
   const type = outType(r);
-  const step = { type, by: playerId, text: null, img: null };
+  const step = { type, by: playerId, text: null, img: null, twist: room.twist || null };
   if (type === 'image') {
     if (!payload.img) return 'bad_image';
+    if (room.twist === 'memory') {
+      const rem = cleanText(payload.remembered);
+      if (!rem) return 'bad_memory';
+      step.remembered = rem;
+    }
     step.img = payload.img;
   } else {
     const text = cleanText(payload.text);
     if (!text) return 'bad_text';
+    if (room.twist === 'words' && text.split(/\s+/).filter(Boolean).length > WORD_LIMIT) return 'too_many_words';
     step.text = text;
   }
   room.chains[chainOf(room, idx, r)].steps[r] = step;
@@ -157,7 +203,7 @@ function advance(room, now, force) {
   if (!force && room.subs.length < room.N) return false;
   room.players.forEach((p, idx) => {
     if (room.subs.includes(p.id)) return;
-    room.chains[chainOf(room, idx, room.round)].steps[room.round] = { type: outType(room.round), by: p.id, text: null, img: null };
+    room.chains[chainOf(room, idx, room.round)].steps[room.round] = { type: outType(room.round), by: p.id, text: null, img: null, twist: room.twist || null };
   });
   room.round += 1;
   if (room.round >= room.rounds) room.phase = 'reveal';
@@ -177,7 +223,7 @@ function revealDone(room) {
 
 function again(room) {
   if (room.phase !== 'end') return false;
-  Object.assign(room, { phase: 'lobby', chains: [], round: 0, subs: [], deadline: null, N: 0 });
+  Object.assign(room, { phase: 'lobby', chains: [], round: 0, subs: [], deadline: null, N: 0, twist: null, twistLog: [], tvFx: {} });
   room.expected = Math.max(room.expected, room.players.length);
   return true;
 }
@@ -193,7 +239,7 @@ function serChains(room) {
   return room.chains.map((ch) => ({
     owner: nameOf(room, ch.owner),
     ownerEmoji: emojiOf(room, ch.owner),
-    steps: ch.steps.map((s) => ({ type: s.type, author: nameOf(room, s.by), hue: hueOf(room, s.by), emoji: emojiOf(room, s.by), text: s.text, img: imgUrl(room, s.img) })),
+    steps: ch.steps.map((s) => ({ type: s.type, author: nameOf(room, s.by), hue: hueOf(room, s.by), emoji: emojiOf(room, s.by), text: s.text, img: imgUrl(room, s.img), twist: s.twist || null, remembered: s.remembered || null })),
   }));
 }
 const timeLeft = (room, now) => (room.deadline ? Math.max(0, room.deadline - now) : null);
@@ -209,6 +255,8 @@ function hostView(room, now) {
     round: room.round,
     N: room.N,
     timerOn: room.timerOn,
+    twistsOn: room.twistsOn !== false,
+    twist: room.phase === 'round' ? room.twist || null : null,
     tText: room.tText,
     tImage: room.tImage,
     maxPlayers: MAX_PLAYERS,
@@ -231,6 +279,7 @@ function playerView(room, playerId, now) {
     rounds: room.rounds,
     expected: room.expected,
     timerOn: room.timerOn,
+    twistsOn: room.twistsOn !== false,
     tText: room.tText,
     tImage: room.tImage,
     round: room.round,
@@ -244,6 +293,9 @@ function playerView(room, playerId, now) {
       const prev = room.chains[chainOf(room, idx, r)].steps[r - 1];
       task.input = prev ? { text: prev.text, img: imgUrl(room, prev.img) } : { text: null, img: null };
     }
+    task.twist = room.twist || null;
+    if (room.twist === 'tv') task.fx = (room.tvFx || {})[me.id] || ['mirror'];
+    if (room.twist === 'words') task.wordLimit = WORD_LIMIT;
     st.task = task;
     st.done = room.subs.includes(me.id);
   }
@@ -252,8 +304,8 @@ function playerView(room, playerId, now) {
 }
 
 module.exports = {
-  MAX_TEXT, MIN_PLAYERS, MAX_PLAYERS, T_TEXT, T_IMAGE, EMOJIS,
+  MAX_TEXT, MIN_PLAYERS, MAX_PLAYERS, T_TEXT, T_IMAGE, EMOJIS, TWISTS, WORD_LIMIT,
   rid, newCode, outType, chainOf, nameOf, hueOf,
-  createRoom, join, setEmoji, disconnect, configure, kick, start, submit, advance, timeUp, revealDone, again, expectedKind,
+  createRoom, join, setEmoji, disconnect, drawTwist, configure, kick, start, submit, advance, timeUp, revealDone, again, expectedKind,
   hostView, playerView,
 };

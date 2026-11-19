@@ -19,7 +19,7 @@ const I18N = {
     step_prompt_hint: 'Start with a wonderfully specific idea.', step_guess_hint: 'You only get the picture. Trust your instincts.',
     press_to_copy: 'Tap to copy', reveal_keys: 'Arrow keys or Space to reveal', progress_label: 'Player progress', preview_mode: 'Preview mode: start the game server to use rooms and multiplayer.',
     copied_room: 'Room code copied', players_ready: '{n} players joined', connected: 'Connected', disconnected: 'Reconnecting',
-    tagline: 'The AI telephone game where prompts go hilariously wrong.', use_prompt: 'Use this prompt:', host_sets: 'The host sets up the game', pick_avatar: 'Tap to pick your avatar', room_full: 'Room full: tap + on Players to let more people in.', wrap: 'That’s a wrap!', wrap_sub: 'Here’s how every chain went hilariously wrong.', download: 'Download souvenir (PDF)', downloading: 'Preparing your souvenir…', downloaded: 'Souvenir downloaded!', e_pdf: 'Couldn’t create the PDF. Try again.', t_text: 'Writing time', t_image: 'Image time', timer_vals: 'Writing {a} · Image {b}', timer_on: 'Timer on', timer_off: 'No timer', n_rounds: '{n} rounds', cancel_room: 'Cancel room', end_game: 'End game', confirm_cancel: 'Cancel this room? Everyone will be sent back to the start.', confirm_end: 'End the game now? Everyone will be sent back to the start.', yes_cancel: 'Yes, cancel it', yes_end: 'Yes, end it', keep_room: 'Keep the room', keep_playing: 'Keep playing', e_room_closed: 'The host closed the room.', room_cancelled: 'Room cancelled.', more_seats: '+{n} more seats', empty_seat: 'Waiting for a player…',
+    tagline: 'The AI telephone game where prompts go hilariously wrong.', twists: 'Twists', twists_on: 'Twists on', twists_off: 'No twists', twist_round: 'Twist this round', twist_first_guess: 'Everyone is guessing this round, but first…', twist_first_image: 'Everyone is making an image this round, but first…', twist_phones: 'Phones are explaining it now', tw_glimpse: 'Glimpse', tw_peep: 'Peephole', tw_tv: 'Bad TV', tw_memory: 'Memory mode', tw_words: 'Word limit', when_guess: 'Guess rounds', when_image: 'Image rounds', td_glimpse: 'You’ll see the image for **4 seconds, just once**. Look closely, then guess from memory.', td_peep: 'You only see the image through a **little window that wanders around**. Piece it together!', td_tv_host: 'Terrible signal. The image gets **a bit clearer as the timer runs down**.', td_tv: 'Terrible signal! Your image is **{fx}**. It gets a bit clearer as time runs out.', td_memory: 'You’ll see the prompt for **5 seconds**. Then write it from memory: **your version** is the one you generate.', td_words: 'Your guess can be **5 words at most**. Choose them well!', show_image: 'Show me the image', got_it: 'Got it', show_prompt: 'Show me the prompt', gone: 'Gone!', from_memory: 'Guess from memory', memorise: 'Memorise it!', disappears: 'It will disappear in {n} s', write_memory: 'Write the prompt from memory', memory_ph: 'What did it say?', copy_mine: 'Copy my version', words_label: 'Your guess ({n} words max)', words_full: 'That’s the limit. Swap a word to change it.', signal: 'Signal', remembered_as: 'Remembered as', fx_pixel: 'pixelated', fx_mirror: 'mirrored', fx_gray: 'black and white', fx_blur: 'blurry', and_: 'and', e_bad_memory: 'Write the prompt from memory first.', e_too_many_words: 'Too many words! 5 max.', use_prompt: 'Use this prompt:', host_sets: 'The host sets up the game', pick_avatar: 'Tap to pick your avatar', room_full: 'Room full: tap + on Players to let more people in.', wrap: 'That’s a wrap!', wrap_sub: 'Here’s how every chain went hilariously wrong.', download: 'Download souvenir (PDF)', downloading: 'Preparing your souvenir…', downloaded: 'Souvenir downloaded!', e_pdf: 'Couldn’t create the PDF. Try again.', t_text: 'Writing time', t_image: 'Image time', timer_vals: 'Writing {a} · Image {b}', timer_on: 'Timer on', timer_off: 'No timer', n_rounds: '{n} rounds', cancel_room: 'Cancel room', end_game: 'End game', confirm_cancel: 'Cancel this room? Everyone will be sent back to the start.', confirm_end: 'End the game now? Everyone will be sent back to the start.', yes_cancel: 'Yes, cancel it', yes_end: 'Yes, end it', keep_room: 'Keep the room', keep_playing: 'Keep playing', e_room_closed: 'The host closed the room.', room_cancelled: 'Room cancelled.', more_seats: '+{n} more seats', empty_seat: 'Waiting for a player…',
     play: 'Play', howto: 'How to play', have_code: 'I have a room code', close: 'Close', back: 'Back',
     how1: '**Everyone joins on their phone** and **writes a prompt**.',
     how2: "You get someone else's prompt: **paste it into your AI image generator** and **upload the picture**.",
@@ -67,7 +67,7 @@ const I18N = {
     step_prompt_hint: 'Empieza con una idea maravillosamente concreta.', step_guess_hint: 'Solo tienes la imagen. Déjate llevar.',
     press_to_copy: 'Pulsa para copiar', reveal_keys: 'Flechas o Espacio para revelar', progress_label: 'Progreso de jugadores', preview_mode: 'Modo de vista previa: inicia el servidor para usar las salas y el multijugador.',
     copied_room: 'Código de sala copiado', players_ready: '{n} jugadores dentro', connected: 'Conectado', disconnected: 'Reconectando',
-    tagline: 'El teléfono roto con IA donde los prompts se tuercen de lo lindo.', use_prompt: 'Usa este prompt:', host_sets: 'El anfitrión configura la partida', pick_avatar: 'Toca para elegir tu avatar', room_full: 'Sala llena: pulsa + en Jugadores para que entre más gente.', wrap: '¡Y hasta aquí!', wrap_sub: 'Así se torció cada cadena de lo lindo.', download: 'Descargar recuerdo (PDF)', downloading: 'Preparando tu recuerdo…', downloaded: '¡Recuerdo descargado!', e_pdf: 'No se pudo crear el PDF. Inténtalo de nuevo.', t_text: 'Tiempo para escribir', t_image: 'Tiempo para la imagen', timer_vals: 'Escribir {a} · Imagen {b}', timer_on: 'Con temporizador', timer_off: 'Sin temporizador', n_rounds: '{n} rondas', cancel_room: 'Cancelar sala', end_game: 'Terminar partida', confirm_cancel: '¿Cancelar esta sala? Todos volverán al inicio.', confirm_end: '¿Terminar la partida ahora? Todos volverán al inicio.', yes_cancel: 'Sí, cancelarla', yes_end: 'Sí, terminarla', keep_room: 'Mantener la sala', keep_playing: 'Seguir jugando', e_room_closed: 'El anfitrión ha cerrado la sala.', room_cancelled: 'Sala cancelada.', more_seats: '+{n} plazas más', empty_seat: 'Esperando jugador…',
+    tagline: 'El teléfono roto con IA donde los prompts se tuercen de lo lindo.', twists: 'Giros', twists_on: 'Con giros', twists_off: 'Sin giros', twist_round: 'Giro de esta ronda', twist_first_guess: 'Esta ronda todos adivinan, pero antes…', twist_first_image: 'Esta ronda todos crean una imagen, pero antes…', twist_phones: 'Los móviles lo están explicando', tw_glimpse: 'Vistazo', tw_peep: 'Mirilla', tw_tv: 'Tele rota', tw_memory: 'Modo memoria', tw_words: 'Límite de palabras', when_guess: 'Rondas de adivinar', when_image: 'Rondas de imagen', td_glimpse: 'Verás la imagen **4 segundos, una sola vez**. Fíjate bien y adivina de memoria.', td_peep: 'Solo ves la imagen por una **ventanita que se va moviendo**. ¡Ármala en tu cabeza!', td_tv_host: 'Señal pésima. La imagen se ve **algo mejor a medida que se acaba el tiempo**.', td_tv: '¡Señal pésima! Tu imagen está **{fx}**. Se ve algo mejor según se acaba el tiempo.', td_memory: 'Verás el prompt **5 segundos**. Luego escríbelo de memoria: **tu versión** es la que generas.', td_words: 'Tu respuesta puede tener **5 palabras como máximo**. ¡Elígelas bien!', show_image: 'Enséñame la imagen', got_it: 'Entendido', show_prompt: 'Enséñame el prompt', gone: '¡Se fue!', from_memory: 'Adivina de memoria', memorise: '¡Memorízalo!', disappears: 'Desaparece en {n} s', write_memory: 'Escribe el prompt de memoria', memory_ph: '¿Qué ponía?', copy_mine: 'Copiar mi versión', words_label: 'Tu respuesta ({n} palabras máx.)', words_full: 'Ese es el límite. Cambia una palabra si quieres.', signal: 'Señal', remembered_as: 'Lo recordó como', fx_pixel: 'pixelada', fx_mirror: 'en espejo', fx_gray: 'en blanco y negro', fx_blur: 'borrosa', and_: 'y', e_bad_memory: 'Primero escribe el prompt de memoria.', e_too_many_words: '¡Demasiadas palabras! Máximo 5.', use_prompt: 'Usa este prompt:', host_sets: 'El anfitrión configura la partida', pick_avatar: 'Toca para elegir tu avatar', room_full: 'Sala llena: pulsa + en Jugadores para que entre más gente.', wrap: '¡Y hasta aquí!', wrap_sub: 'Así se torció cada cadena de lo lindo.', download: 'Descargar recuerdo (PDF)', downloading: 'Preparando tu recuerdo…', downloaded: '¡Recuerdo descargado!', e_pdf: 'No se pudo crear el PDF. Inténtalo de nuevo.', t_text: 'Tiempo para escribir', t_image: 'Tiempo para la imagen', timer_vals: 'Escribir {a} · Imagen {b}', timer_on: 'Con temporizador', timer_off: 'Sin temporizador', n_rounds: '{n} rondas', cancel_room: 'Cancelar sala', end_game: 'Terminar partida', confirm_cancel: '¿Cancelar esta sala? Todos volverán al inicio.', confirm_end: '¿Terminar la partida ahora? Todos volverán al inicio.', yes_cancel: 'Sí, cancelarla', yes_end: 'Sí, terminarla', keep_room: 'Mantener la sala', keep_playing: 'Seguir jugando', e_room_closed: 'El anfitrión ha cerrado la sala.', room_cancelled: 'Sala cancelada.', more_seats: '+{n} plazas más', empty_seat: 'Esperando jugador…',
     play: 'Jugar', howto: 'Cómo jugar', have_code: 'Tengo un código de sala', close: 'Cerrar', back: 'Volver',
     how1: '**Todos entran desde el móvil** y **escriben un prompt**.',
     how2: 'Recibes el prompt de otra persona: **pégalo en tu generador de imágenes con IA** y **sube la imagen**.',
@@ -233,8 +233,8 @@ let hostSess = LS.get('pw_host');
 let playerSess = LS.get('pw_player');
 const draft = { code: urlCode, name: (playerSess && playerSess.name) || '', text: '', guess: '', img: null, busy: false };
 const savedCfg = LS.get('pw_cfg') || {};
-let cfg = { players: 3, rounds: 3, timer: savedCfg.timer !== false, tText: savedCfg.tText || 60, tImage: savedCfg.tImage || 150 };
-const saveCfg = () => LS.set('pw_cfg', { timer: cfg.timer, tText: cfg.tText, tImage: cfg.tImage });
+let cfg = { players: 3, rounds: 3, timer: savedCfg.timer !== false, tText: savedCfg.tText || 60, tImage: savedCfg.tImage || 150, twists: savedCfg.twists !== false };
+const saveCfg = () => LS.set('pw_cfg', { timer: cfg.timer, tText: cfg.tText, tImage: cfg.tImage, twists: cfg.twists });
 const T_TEXT = { min: 15, max: 600, step: 15 }, T_IMAGE = { min: 30, max: 1200, step: 30 };
 const clampT = (v, r) => Math.max(r.min, Math.min(r.max, v));
 const fmtS = (sec) => Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
@@ -286,7 +286,7 @@ function onMsg(m) {
       const prevRound = S && S.t === 'player_state' && S.phase === 'round' ? S.round : null;
       S = m; S._at = performance.now();
       if (m.phase !== 'end') V2 = null;
-      if (m.phase !== 'round' || prevRound !== m.round) { draft.text = ''; draft.guess = ''; draft.img = null; draft.busy = false; }
+      if (m.phase !== 'round' || prevRound !== m.round) { draft.text = ''; draft.guess = ''; draft.img = null; draft.remembered = ''; draft.busy = false; }
       return render();
     }
     case 'error': {
@@ -392,6 +392,45 @@ function confirmBox(text, yes, no, onYes) {
 }
 const closeRoom = (inGame) => confirmBox(t(inGame ? 'confirm_end' : 'confirm_cancel'), t(inGame ? 'yes_end' : 'yes_cancel'), t(inGame ? 'keep_playing' : 'keep_room'), () => { if (!send({ t: 'close' })) document.querySelector('.modal')?.remove(); });
 const endBtn = () => h('button', { class: 'btn endgame', onclick: () => closeRoom(true) }, ic('close'), t('end_game'));
+// ======================================================= twists
+const TW_CLASS = { glimpse: 't-glimpse', peep: 't-peep', tv: 't-tv', memory: 't-mem', words: 't-words' };
+const TW_ICON = { glimpse: 'eye-i', peep: 'peep-i', tv: 'tv-i', memory: 'mem-i', words: 'words-i' };
+const twName = (id) => t('tw_' + id);
+function twistChip(id, extra = '') {
+  return h('span', { class: `tchip ${TW_CLASS[id]} ${extra}` }, h('span', { class: 'ti' }, h('i', { class: 'mi ' + TW_ICON[id] })), twName(id));
+}
+function twistIll(id) {
+  const scene = () => h('div', { class: 'scene mini' });
+  if (id === 'glimpse') return h('div', { class: 'ill', 'aria-hidden': 'true' }, h('div', { class: 'eye' }, h('span', { class: 'lid t' }), h('span', { class: 'lid b' })), h('span', { class: 'watch' }, '4s'));
+  if (id === 'peep') return h('div', { class: 'ill', 'aria-hidden': 'true' }, h('div', { class: 'peep' }, scene(), h('span', { class: 'dark' }), h('span', { class: 'ring' })));
+  if (id === 'tv') return h('div', { class: 'ill', 'aria-hidden': 'true', style: 'padding-top:1.4em' }, h('div', { class: 'crt' }, h('span', { class: 'screen' }), h('span', { class: 'knobs' }, h('i'), h('i'))));
+  if (id === 'memory') {
+    const words = lang === 'es' ? ['Un gato', 'haciendo', 'la', 'renta'] : ['A cat', 'doing', 'its', 'taxes'];
+    return h('div', { class: 'ill', 'aria-hidden': 'true' }, h('div', { class: 'memo' }, h('span', { class: 'sec' }, '5'),
+      h('div', { class: 'tw-bubble fade' }, words.map((w, i) => [i ? ' ' : '', h('span', null, w)])), h('div', { class: 'bar' }, h('i'))));
+  }
+  const ws = lang === 'es' ? ['Gato', 'hace', 'mates', 'tristes'] : ['Cat', 'doing', 'sad', 'maths'];
+  return h('div', { class: 'ill', 'aria-hidden': 'true' }, h('div', { style: 'display:flex;flex-direction:column;align-items:center' },
+    h('div', { class: 'slots' }, ws.map((w) => h('i', null, w)), h('i', { class: 'empty' }, '.'), h('i', { class: 'cut' }, lang === 'es' ? 'fuera' : 'outside')),
+    h('span', { class: 'scissors' }, lang === 'es' ? '5 PALABRAS MÁX.' : '5 WORDS MAX')));
+}
+function fxText(fx) {
+  const names = ['pixel', ...(fx || [])].map((f) => t('fx_' + f));
+  return names.length > 1 ? names.slice(0, -1).join(', ') + ' ' + t('and_') + ' ' + names[names.length - 1] : names[0];
+}
+/** Big twist card. opts.host: TV wording; opts.fx: Bad TV effects for this phone. */
+function twistCard(id, opts = {}) {
+  const desc = id === 'tv' ? (opts.host ? t('td_tv_host') : t('td_tv', { fx: fxText(opts.fx) })) : t('td_' + id);
+  return h('div', { class: 'tcard ' + TW_CLASS[id] },
+    opts.when === false ? null : h('span', { class: 'twhen' }, t(id === 'memory' ? 'when_image' : 'when_guess')),
+    twistIll(id), h('span', { class: 'tname' }, twName(id)), h('span', { class: 'tdesc' }, rich(desc)));
+}
+// per-round twist progress on this phone (survives refresh): { stage, at }
+const twKey = () => `pw_tw_${S.code}_${S.round}_${S.me && S.me.id}`;
+const twState = () => LS.get(twKey()) || {};
+const twSet = (v) => LS.set(twKey(), Object.assign(twState(), v));
+let twTimers = [];
+const twClear = () => { twTimers.forEach((x) => { clearTimeout(x); clearInterval(x); }); twTimers = []; };
 const stepName = (type) => t(type === 'prompt' ? 's_prompt' : type === 'image' ? 's_image' : 's_guess');
 
 /** One reveal slot: number + label, the card (bubble / image frame), author. */
@@ -399,11 +438,12 @@ function slot(step, i, state, opts = {}) {
   let box;
   if (state === 'future') box = h('div', { class: 'cardbox bubble wait' }, h('span', { class: 'q' }, '?'));
   else if (opts.suspense) box = h('div', { class: 'cardbox ' + (step.type === 'image' ? 'frame' : 'bubble' + (step.type === 'guess' ? ' pink' : '')) }, h('span', { class: 'susp' }, h('i'), h('i'), h('i')));
-  else if (step.type === 'image') box = h('div', { class: 'cardbox frame' }, step.img ? h('img', { src: apiUrl(step.img), alt: stepName('image') + ' · ' + step.author }) : h('div', { class: 'none' }, ic('image'), t('no_image')));
+  else if (step.type === 'image') box = h('div', { class: 'cardbox frame' + (step.remembered ? ' with-mem' : '') }, step.img ? h('img', { src: apiUrl(step.img), alt: stepName('image') + ' · ' + step.author }) : h('div', { class: 'none' }, ic('image'), t('no_image')));
   else box = h('div', { class: 'cardbox bubble' + (step.type === 'guess' ? ' pink' : '') + (opts.type ? ' type-me' : ''), 'data-full': step.text || '' }, opts.type ? '' : (step.text || t('no_text')));
   const showWho = state !== 'future' && !opts.suspense;
   return h('div', { class: `slot ${step.type} ${state} ${opts.enter ? 'enter' : ''}` },
-    h('div', { class: 'lbl' }, h('b', null, (i + 1) + '.'), stepName(step.type)),
+    h('div', { class: 'lbl' }, h('span', null, h('b', null, (i + 1) + '.'), stepName(step.type)), state !== 'future' && step.twist ? twistChip(step.twist) : null),
+    state !== 'future' && !opts.suspense && step.remembered ? h('div', { class: 'mem-note' }, h('small', null, t('remembered_as')), h('span', null, '“' + step.remembered + '”')) : null,
     box,
     showWho ? h('span', { class: 'who' }, avatar(step), step.author) : h('span', { class: 'who' }, ' '));
 }
@@ -467,8 +507,9 @@ function setupView() {
       stepper(t('rounds'), cfg.rounds, 3, cfg.players, (d) => set({ rounds: Math.max(3, Math.min(cfg.players, cfg.rounds + d)) })),
       toggle(t('timer'), cfg.timer, (v) => set({ timer: v })),
       cfg.timer ? timeSteppers(cfg.tText, cfg.tImage, (k, d) => set({ [k]: cfg[k] + d })) : null,
+      toggle(t('twists'), cfg.twists, (v) => set({ twists: v })),
       h('p', { class: 'hint' }, t('rounds_hint')),
-      h('button', { class: 'btn primary big block', onclick: act({ t: 'host_create', players: cfg.players, rounds: cfg.rounds, timer: cfg.timer, tText: cfg.tText, tImage: cfg.tImage }) }, t('create_room')),
+      h('button', { class: 'btn primary big block', onclick: act({ t: 'host_create', players: cfg.players, rounds: cfg.rounds, timer: cfg.timer, tText: cfg.tText, tImage: cfg.tImage, twists: cfg.twists }) }, t('create_room')),
       h('button', { class: 'btn ghost block', onclick: () => { V = 'landing'; render(); } }, t('back')))));
 }
 function joinView() {
@@ -501,12 +542,12 @@ function lobbyView() {
   const shown = location.host + BASE.replace(/\/$/, '');
   const n = S.players.length;
   const set = (patch) => {
-    const c = Object.assign({ players: S.expected, rounds: S.rounds, timer: S.timerOn, tText: S.tText, tImage: S.tImage }, patch);
+    const c = Object.assign({ players: S.expected, rounds: S.rounds, timer: S.timerOn, tText: S.tText, tImage: S.tImage, twists: S.twistsOn }, patch);
     c.players = Math.max(Math.max(3, n), Math.min(MAXP(), c.players)); c.rounds = Math.max(3, Math.min(c.rounds, c.players));
     c.tText = clampT(c.tText, T_TEXT); c.tImage = clampT(c.tImage, T_IMAGE);
     // optimistic: update locally right away, server confirms
-    if (c.players === S.expected && c.rounds === S.rounds && c.timer === S.timerOn && c.tText === S.tText && c.tImage === S.tImage) return false;
-    Object.assign(S, { expected: c.players, rounds: c.rounds, timerOn: c.timer, tText: c.tText, tImage: c.tImage }); cfg = c; saveCfg(); send(Object.assign({ t: 'config' }, c)); render();
+    if (c.players === S.expected && c.rounds === S.rounds && c.timer === S.timerOn && c.tText === S.tText && c.tImage === S.tImage && c.twists === S.twistsOn) return false;
+    Object.assign(S, { expected: c.players, rounds: c.rounds, timerOn: c.timer, tText: c.tText, tImage: c.tImage, twistsOn: c.twists }); cfg = c; saveCfg(); send(Object.assign({ t: 'config' }, c)); render();
     return true;
   };
   const rows = S.players.map((p) => h('div', { class: 'prow' + (p.connected ? '' : ' off'), 'data-k': p.id }, avatar(p, p.connected ? '' : 'off'), h('span', { class: 'n' }, p.name), ic('check'),
@@ -526,7 +567,8 @@ function lobbyView() {
           stepper(t('players'), S.expected, Math.max(3, n), MAXP(), (d) => set({ players: S.expected + d })),
           stepper(t('rounds'), S.rounds, 3, S.expected, (d) => set({ rounds: S.rounds + d })),
           toggle(t('timer'), S.timerOn, (v) => set({ timer: v })),
-          S.timerOn ? timeSteppers(S.tText, S.tImage, (k, d) => set({ [k]: S[k] + d })) : null)),
+          S.timerOn ? timeSteppers(S.tText, S.tImage, (k, d) => set({ [k]: S[k] + d })) : null,
+          toggle(t('twists'), S.twistsOn !== false, (v) => set({ twists: v })))),
       h('div', { class: 'players-panel' },
         h('h3', { 'aria-live': 'polite' }, t('n_players', { n, max: S.expected })),
         h('div', { class: 'plist' + (n > 16 ? ' three' : n > 8 ? ' two' : '') }, rows),
@@ -534,21 +576,34 @@ function lobbyView() {
         h('button', { class: 'btn primary big block', disabled: n < 3, onclick: act({ t: 'start' }) }, n < 3 ? t('need_more') : [ic('play'), t('start')]),
         h('button', { class: 'btn danger-outline block', onclick: () => closeRoom(false) }, ic('close'), t('cancel_room'))))));
 }
+let twIntro = { round: -1, until: 0 };
 function roundView() {
   const type = S.round === 0 ? 'prompt' : S.round % 2 ? 'image' : 'guess';
   const done = S.players.filter((p) => p.done).length;
-  mount('round'+S.round, h('main', { class: 'screen round' },
-    h('h2', null, t('round_of', { r: S.round + 1, R: S.rounds })),
-    timerPill(),
-    h('p', { class: 'instr' }, t('i_' + type)),
+  if (S.twist && twIntro.round !== S.round) { twIntro = { round: S.round, until: Date.now() + 4800 }; setTimeout(() => { if (role === 'host' && S && S.phase === 'round') render(); }, 4850); }
+  if (S.twist && Date.now() < twIntro.until) {
+    mount('intro' + S.round, h('main', { class: 'screen twist-intro' },
+      h('div', { class: 'col', style: 'align-items:center;gap:.25em' }, h('h2', null, t('round_of', { r: S.round + 1, R: S.rounds })), h('span', { class: 'muted' }, t(type === 'image' ? 'twist_first_image' : 'twist_first_guess'))),
+      h('div', { class: 'stage-card' }, h('span', { class: 'tw-stamp' }, 'TWIST!'), twistCard(S.twist, { host: true }), confetti(6)),
+      h('div', { class: 'row center' }, h('span', { class: 'getready' }, h('i')), h('span', { class: 'small muted' }, t('twist_phones')))));
+    return;
+  }
+  const players = h('div', { class: 'col', style: 'align-items:center;gap:1em' },
     h('div', { class: 'pgrid' + (S.players.length > 12 ? ' many' : ''), role: 'list', 'aria-label': t('progress_label') }, S.players.map((p) =>
       h('div', { class: 'pstat ' + (p.done ? 'done' : p.connected ? 'work' : 'lost'), role: 'listitem', 'data-k': p.id },
         avatar(p, p.connected ? '' : 'off'), h('span', { class: 'n' }, p.name),
         h('span', { class: 'st' }, p.done ? [t('done'), ic('check')] : p.connected ? t('working') : [ic('warn'), t('disconnected')])))),
+    h('div', { class: 'progress' },
+      h('div', { class: 'bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(S.players.length), 'aria-valuenow': String(done), 'aria-label': t('progress_label') }, h('i', { style: `width:${(done / S.players.length) * 100}%` })),
+      h('span', { class: 'count' }, t('n_done', { n: done, N: S.players.length }))));
+  mount('round'+S.round, h('main', { class: 'screen round' },
+    h('h2', null, t('round_of', { r: S.round + 1, R: S.rounds })),
+    timerPill(),
+    h('p', { class: 'instr' }, t('i_' + type)),
+    h('div', { class: 'round-body' + (S.twist ? '' : ' plain') },
+      S.twist ? h('div', { class: 'col', style: 'align-items:center;gap:.5em' }, twistChip(S.twist), twistCard(S.twist, { host: true, when: false })) : null,
+      players),
     h('div', { class: 'foot' },
-      h('div', { class: 'progress' },
-        h('div', { class: 'bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(S.players.length), 'aria-valuenow': String(done), 'aria-label': t('progress_label') }, h('i', { style: `width:${(done / S.players.length) * 100}%` })),
-        h('span', { class: 'count' }, t('n_done', { n: done, N: S.players.length }))),
       h('div', { class: 'row center' }, h('button', { class: 'btn secondary', onclick: act({ t: 'skip' }) }, t('skip')), endBtn()))));
 }
 
@@ -647,35 +702,156 @@ async function fileToJpeg(file) {
     return c.toDataURL('image/jpeg', 0.85);
   } finally { URL.revokeObjectURL(url); }
 }
+function twistNotice(task) {
+  const id = task.twist;
+  const label = id === 'glimpse' ? t('show_image') : id === 'memory' ? t('show_prompt') : t('got_it');
+  mount('notice' + S.round, h('main', { class: 'screen task tw-notice' },
+    phoneHeader(), h('p', { class: 'roundtag' }, t('round_of', { r: S.round + 1, R: S.rounds })),
+    h('span', { class: 'tw-stamp' }, 'TWIST!'),
+    twistCard(id, { fx: task.fx }),
+    h('button', { class: 'btn primary big block', onclick: () => { twSet({ stage: id === 'glimpse' ? 'peek' : id === 'memory' ? 'memo' : 'go', at: Date.now() }); lastKey = null; render(); } }, label)), { fresh: true });
+}
+const roundTag = (twist) => h('p', { class: 'roundtag' }, t('round_of', { r: S.round + 1, R: S.rounds }), twist ? twistChip(twist, 'tw-inline') : null);
+
+/** The image a guesser sees, shaped by this round's twist. */
+function guessImage(task) {
+  const src = task.input && task.input.img ? apiUrl(task.input.img) : null;
+  if (!src) return h('div', { class: 'noimg' }, ic('image'), t('no_image'));
+  const tw = task.twist;
+  if (tw === 'glimpse') {
+    const st = twState(), left = Math.max(0, 4000 - (Date.now() - (st.at || 0)));
+    const ring = h('span', { class: 'ringtimer', 'data-n': String(Math.ceil(left / 1000)) });
+    const box = h('div', { class: 'glimpse-box' + (left <= 0 ? ' gone' : '') }, h('img', { src, alt: '' }), left > 0 ? ring : h('div', { class: 'msg' }, t('gone'), h('span', null, t('from_memory'))));
+    if (left > 0) {
+      const tick = setInterval(() => {
+        const l = Math.max(0, 4000 - (Date.now() - (twState().at || 0)));
+        ring.setAttribute('data-n', String(Math.ceil(l / 1000)));
+        ring.style.background = `conic-gradient(var(--cyan) 0 ${(l / 4000) * 100}%, rgba(11,10,26,.75) 0)`;
+        if (l <= 0) { clearInterval(tick); box.classList.add('gone'); ring.replaceWith(h('div', { class: 'msg' }, t('gone'), h('span', null, t('from_memory')))); }
+      }, 100);
+      twTimers.push(tick);
+    }
+    return box;
+  }
+  if (tw === 'peep') return h('div', { class: 'peep big' }, h('img', { src, alt: '' }), h('span', { class: 'dark' }), h('span', { class: 'ring' }));
+  if (tw === 'tv') return badTv(src, task.fx || []);
+  return h('img', { class: 'guessimg', src, alt: '' });
+}
+
+/** Bad TV: pixelated canvas that sharpens with the round timer (or over 60 s), never fully. */
+function badTv(src, fx) {
+  const canvas = h('canvas', { width: '320', height: '240', 'aria-label': t('tw_tv') });
+  const bars = [6, 10, 13, 16].map((hgt) => h('i', { style: `height:${hgt}px` }));
+  const box = h('div', { class: 'tvbox' + (fx.includes('mirror') ? ' mirror' : '') }, canvas, h('span', { class: 'rgb' }), h('span', { class: 'scan' }));
+  const wrap = h('div', { class: 'col', style: 'gap:8px' }, box, h('div', { class: 'sigrow' }, h('span', null, t('signal')), h('span', { class: 'signal' }, bars)));
+  const img = new Image();
+  const start = twState().at || Date.now();
+  const total = S.timerOn ? (S.tText || 60) * 1000 : 60000;
+  const draw = () => {
+    if (!img.complete || !img.naturalWidth) return;
+    const left = S.timerOn && S.timeLeft != null ? Math.max(0, S.timeLeft - (performance.now() - S._at)) : Math.max(0, total - (Date.now() - start));
+    const k = Math.min(1, Math.max(0, 1 - left / total));
+    const block = Math.round(30 - 20 * k); // 30px blocks → 10px blocks: never crisp
+    const w = Math.max(4, Math.round(320 / block)), hh = Math.max(3, Math.round(240 / block));
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    const tmp = draw.tmp || (draw.tmp = document.createElement('canvas'));
+    tmp.width = w; tmp.height = hh;
+    const tc = tmp.getContext('2d');
+    // cover-crop to 4:3
+    const r = Math.max(w / img.naturalWidth, hh / img.naturalHeight), dw = img.naturalWidth * r, dh = img.naturalHeight * r;
+    tc.drawImage(img, (w - dw) / 2, (hh - dh) / 2, dw, dh);
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, 320, 240);
+    ctx.drawImage(tmp, 0, 0, w, hh, 0, 0, 320, 240);
+    const gray = fx.includes('gray') ? (k < 0.8 ? 1 : Math.max(0.15, 1 - ((k - 0.8) / 0.2) * 0.85)) : 0;
+    const blur = fx.includes('blur') ? (1.4 - 1 * k).toFixed(1) : 0; // light, so the pixel blocks stay readable
+    canvas.style.filter = `grayscale(${gray}) blur(${blur}px)`;
+    const sig = 1 + Math.min(2, Math.floor(k * 3));
+    bars.forEach((b, i) => b.classList.toggle('off', i >= sig));
+  };
+  img.onload = draw;
+  img.src = src;
+  twTimers.push(setInterval(draw, 700));
+  return wrap;
+}
+
 function taskView() {
   const task = S.task;
-  const head = [phoneHeader(), h('p', { class: 'roundtag' }, t('round_of', { r: S.round + 1, R: S.rounds }))];
+  twClear();
+  if (task.twist && !twState().stage) return twistNotice(task);
+  const head = [phoneHeader(), roundTag(task.twist)];
   const counter = (val) => h('div', { class: 'counter' + (val.length > MAX_TEXT - 15 ? ' warn' : '') }, `${val.length} / ${MAX_TEXT}`);
 
   if (task.type === 'prompt' || task.type === 'guess') {
     const isPrompt = task.type === 'prompt';
     const key = isPrompt ? 'text' : 'guess';
+    const limit = !isPrompt && task.twist === 'words' ? task.wordLimit || 5 : 0;
     const cnt = h('div', { 'aria-live': 'polite' }, counter(draft[key]));
     const btn = h('button', { class: 'btn primary big block', disabled: !draft[key].trim() || draft.busy, onclick: () => { draft.busy = true; btn.disabled = true; btn.textContent = t('sending'); send({ t: 'submit', data: draft[key] }); } }, isPrompt ? t('send_prompt') : t('send_guess'));
+    const wordsOf = (v) => v.trim().split(/\s+/).filter(Boolean);
+    const wordRow = h('span', { class: 'wordrow' });
+    const wordCount = h('b');
+    const hint = h('span', { class: 'words-hint', hidden: true }, t('words_full'));
+    const paintWords = () => {
+      const ws = wordsOf(draft[key]);
+      wordRow.replaceChildren(...ws.map((w) => h('i', null, w)), ...Array.from({ length: Math.max(0, limit - ws.length) }, () => h('i', { class: 'empty' })));
+      wordCount.textContent = `${ws.length} / ${limit}`;
+      hint.hidden = ws.length < limit;
+      field.classList.toggle('words-full', ws.length >= limit);
+    };
     const field = h(isPrompt ? 'textarea' : 'input', { type: isPrompt ? null : 'text', value: draft[key], maxlength: String(MAX_TEXT), placeholder: isPrompt ? t('prompt_ph') : t('guess_ph'), 'aria-label': isPrompt ? t('write_prompt') : t('guess_title'), autocomplete: 'off',
-      oninput: (e) => { draft[key] = e.target.value; cnt.replaceChildren(counter(draft[key])); btn.disabled = !draft[key].trim() || draft.busy; } });
+      oninput: (e) => {
+        if (limit && wordsOf(e.target.value).length > limit) {
+          e.target.value = draft[key]; e.target.classList.remove('shake'); void e.target.offsetWidth; e.target.classList.add('shake');
+        } else draft[key] = e.target.value;
+        cnt.replaceChildren(counter(draft[key])); btn.disabled = !draft[key].trim() || draft.busy;
+        if (limit) paintWords();
+      } });
     const body = isPrompt
       ? [h('h2', { class: 'ptitle' }, t('write_prompt')), field, cnt,
          h('button', { class: 'btn secondary block', onclick: () => { const s = t('sugg'); field.value = draft.text = s[Math.floor(Math.random() * s.length)]; field.dispatchEvent(new Event('input')); } }, ic('dice'), t('surprise'))]
-      : [h('h2', { class: 'ptitle' }, t('guess_title')),
-         task.input && task.input.img ? h('img', { class: 'guessimg', src: apiUrl(task.input.img), alt: '' }) : h('div', { class: 'noimg' }, ic('image'), t('no_image')), field, cnt];
+      : [h('h2', { class: 'ptitle' }, t('guess_title')), guessImage(task),
+         limit ? h('label', { class: 'field', style: 'gap:6px' }, t('words_label', { n: limit }), field) : field,
+         limit ? [h('div', { class: 'wordbar' }, wordRow, wordCount), hint] : cnt];
+    if (limit) paintWords();
     mount('task'+S.round, h('main', { class: 'screen task' }, head, h('div', { class: 'fill' }, body), btn), { fresh: true });
     return;
   }
 
   // image task
   const inp = task.input || {};
+  const memory = task.twist === 'memory' && inp.text;
+  if (memory) {
+    const st = twState();
+    const left = st.stage === 'memo' ? 5000 - (Date.now() - (st.at || 0)) : 0;
+    if (left > 0) {
+      const secs = h('span', { class: 'sec' }, String(Math.ceil(left / 1000)));
+      const note = h('span', { class: 'small muted', style: 'text-align:center' }, t('disappears', { n: Math.ceil(left / 1000) }));
+      mount('memo' + S.round, h('main', { class: 'screen task memo-screen' }, phoneHeader(), roundTag('memory'),
+        h('h2', { class: 'ptitle' }, t('memorise')),
+        h('div', { class: 'memo-big' }, secs, h('div', { class: 'tw-bubble' }, inp.text)),
+        h('div', { class: 'memo-drain' }, h('i', { style: `animation-duration:${left}ms` })), note), { fresh: true });
+      const tick = setInterval(() => {
+        const l = 5000 - (Date.now() - (twState().at || 0));
+        secs.textContent = String(Math.max(0, Math.ceil(l / 1000))); note.textContent = t('disappears', { n: Math.max(0, Math.ceil(l / 1000)) });
+        if (l <= 0) { clearInterval(tick); twSet({ stage: 'write' }); lastKey = null; render(); }
+      }, 200);
+      twTimers.push(tick);
+      return;
+    }
+  }
+  if (draft.remembered == null) draft.remembered = '';
+  const ready = () => !!draft.img && (!memory || !!draft.remembered.trim()) && !draft.busy;
   const preview = h('img', { class: 'preview', alt: '', hidden: !draft.img, src: draft.img || '' });
-  const btn = h('button', { class: 'btn primary big block', disabled: !draft.img || draft.busy, onclick: () => { draft.busy = true; btn.disabled = true; btn.textContent = t('uploading'); if (send({ t: 'submit', data: draft.img })) toast(t('uploaded')); else { draft.busy = false; btn.disabled = false; btn.textContent = t('upload'); } } }, t('upload'));
+  const btn = h('button', { class: 'btn primary big block', disabled: !ready(), onclick: () => {
+    draft.busy = true; btn.disabled = true; btn.textContent = t('uploading');
+    const msg = { t: 'submit', data: draft.img }; if (memory) msg.remembered = draft.remembered;
+    if (send(msg)) toast(t('uploaded')); else { draft.busy = false; btn.disabled = false; btn.textContent = t('upload'); } } }, t('upload'));
   const dzIcon = ic('image');
   const take = async (file) => {
     if (!file || !/^image\//.test(file.type)) return;
-    try { draft.img = await fileToJpeg(file); preview.src = draft.img; preview.hidden = false; dzIcon.hidden = true; dz.classList.add('has-img'); btn.disabled = draft.busy; btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+    try { draft.img = await fileToJpeg(file); preview.src = draft.img; preview.hidden = false; dzIcon.hidden = true; dz.classList.add('has-img'); btn.disabled = !ready(); btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
     catch { toast(t('e_img'), 'error'); }
   };
   if (draft.img) dzIcon.hidden = true;
@@ -688,13 +864,18 @@ function taskView() {
       h('button', { class: 'btn secondary', onclick: () => cam.click() }, ic('camera'), t('camera')),
       h('button', { class: 'btn secondary', onclick: () => gal.click() }, ic('image'), t('gallery'))), cam, gal);
   pasteHandler = (e) => { const f = [...(e.clipboardData ? e.clipboardData.files : [])][0]; if (f) take(f); };
+  let promptPart;
+  if (memory) {
+    const ta = h('textarea', { class: 'mem-field', value: draft.remembered, maxlength: String(MAX_TEXT), placeholder: t('memory_ph'), style: 'min-height:84px', 'aria-label': t('write_memory'),
+      oninput: (e) => { draft.remembered = e.target.value; btn.disabled = !ready(); } });
+    promptPart = [h('label', { class: 'field' }, t('write_memory'), ta),
+      h('button', { class: 'btn secondary block', onclick: () => draft.remembered.trim() ? copyText(draft.remembered) : toast(t('e_bad_memory'), 'error') }, ic('copy'), t('copy_mine'))];
+  } else if (inp.text) {
+    promptPart = [h('p', { class: 'useprompt' }, t('use_prompt')), h('div', { class: 'promptbox' }, inp.text),
+      h('button', { class: 'btn secondary block', onclick: () => copyText(inp.text) }, ic('copy'), t('copy_prompt'))];
+  } else promptPart = h('div', { class: 'noimg', style: 'aspect-ratio:auto;padding:16px' }, t('skipped_in'));
   mount('task'+S.round, h('main', { class: 'screen task' }, head,
-    h('div', { class: 'fill' },
-      h('h2', { class: 'ptitle' }, t('gen_image')),
-      inp.text ? [h('p', { class: 'useprompt' }, t('use_prompt')), h('div', { class: 'promptbox' }, inp.text),
-        h('button', { class: 'btn secondary block', onclick: () => copyText(inp.text) }, ic('copy'), t('copy_prompt'))]
-        : h('div', { class: 'noimg', style: 'aspect-ratio:auto;padding:16px' }, t('skipped_in')),
-      dz), btn), { fresh: true });
+    h('div', { class: 'fill' }, h('h2', { class: 'ptitle' }, t('gen_image')), promptPart, dz), btn), { fresh: true });
 }
 let pasteHandler = null;
 document.addEventListener('paste', (e) => { if (pasteHandler) pasteHandler(e); });
@@ -706,7 +887,7 @@ function playerView() {
     if (lastKey === key && $app.firstChild) return;
     lastKey = key; taskView(); return;
   }
-  lastKey = null; pasteHandler = null;
+  lastKey = null; pasteHandler = null; twClear();
   if (ph === 'lobby') {
     mount('p-lobby', h('main', { class: 'screen mid' },
       h('div', { class: 'milestone small' }, h('div', { class: 'hourglass', 'aria-hidden': 'true' }, h('span', { class: 'glass' }), h('span', { class: 'rim' }))),
@@ -723,7 +904,8 @@ function playerView() {
         h('div', { class: 'gi-row' },
           h('span', null, ic('user'), t('n_players', { n: S.players.length, max: S.expected })),
           h('span', null, t('n_rounds', { n: S.rounds })),
-          h('span', null, ic('clock'), S.timerOn ? t('timer_vals', { a: fmtS(S.tText || 60), b: fmtS(S.tImage || 150) }) : t('timer_off')))) : null));
+          h('span', null, ic('clock'), S.timerOn ? t('timer_vals', { a: fmtS(S.tText || 60), b: fmtS(S.tImage || 150) }) : t('timer_off')),
+          h('span', null, S.twistsOn !== false ? t('twists_on') : t('twists_off')))) : null));
   } else if (ph === 'round') {
     mount('p-done'+S.round, h('main', { class: 'screen mid' },
       h('div', { class: 'milestone' }, confetti(6), h('div', { class: 'bigcheck', role: 'img', 'aria-label': t('done') })),

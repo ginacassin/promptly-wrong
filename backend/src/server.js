@@ -189,7 +189,7 @@ async function main() {
       case 'host_create': {
         let room;
         for (let i = 0; i < 20; i++) {
-          room = G.createRoom({ code: G.newCode(), players: msg.players, rounds: msg.rounds, timer: msg.timer, tText: msg.tText, tImage: msg.tImage });
+          room = G.createRoom({ code: G.newCode(), players: msg.players, rounds: msg.rounds, timer: msg.timer, tText: msg.tText, tImage: msg.tImage, twists: msg.twists });
           if (await store.create(room)) break;
           room = null;
         }
@@ -241,11 +241,13 @@ async function main() {
       if (!room) return send(ws, { t: 'error', code: 'no_room' });
       const payload = {};
       if (G.expectedKind(room) === 'image') {
+        if (room.twist === 'memory' && !String(msg.remembered || '').trim()) return send(ws, { t: 'error', code: 'bad_memory' });
         const m = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(String(msg.data || ''));
         if (!m) return send(ws, { t: 'error', code: 'bad_image' });
         const buf = Buffer.from(m[2], 'base64');
         if (!buf.length || buf.length > MAX_IMG_BYTES) return send(ws, { t: 'error', code: 'bad_image' });
         payload.img = G.rid(10);
+        payload.remembered = msg.remembered;
         await store.putImage(c.code, payload.img, buf, m[1]);
       } else payload.text = msg.data;
       let err = null;

@@ -35,7 +35,7 @@ const T = {
     chain: 'CHAIN {c} OF {C}', from: 'From', to: 'to', started: 'Started by {name}',
     s_prompt: 'Original prompt', s_image: 'Generated image', s_guess: 'Guess', no_image: 'No image (skipped)', no_text: '(nothing sent)',
     cont: 'continued', starring: 'STARRING', theend: 'The End', thanks: 'Thanks for playing!', again: 'Play again at {host}',
-    page: 'page {n}', quips: ['NAILED IT. SORT OF.', 'LOST IN TRANSLATION', 'CLOSE ENOUGH!', 'THE AI MADE ME DO IT', 'TECHNICALLY CORRECT', 'NO NOTES', 'CHAOS: ACHIEVED', 'WHO WROTE THIS?!', 'PERFECTLY WRONG'],
+    page: 'page {n}', remembered: 'Remembered as:', twists: { glimpse: 'Glimpse', peep: 'Peephole', tv: 'Bad TV', memory: 'Memory mode', words: 'Word limit' }, quips: ['NAILED IT. SORT OF.', 'LOST IN TRANSLATION', 'CLOSE ENOUGH!', 'THE AI MADE ME DO IT', 'TECHNICALLY CORRECT', 'NO NOTES', 'CHAOS: ACHIEVED', 'WHO WROTE THIS?!', 'PERFECTLY WRONG'],
   },
   es: {
     souvenir: 'EDICIÓN RECUERDO', room: 'Sala', players: 'jugadores', rounds: 'rondas', chains: 'cadenas',
@@ -44,7 +44,7 @@ const T = {
     chain: 'CADENA {c} DE {C}', from: 'De', to: 'a', started: 'Empezó {name}',
     s_prompt: 'Prompt original', s_image: 'Imagen generada', s_guess: 'Adivinanza', no_image: 'Sin imagen (omitida)', no_text: '(no envió nada)',
     cont: 'continuación', starring: 'PROTAGONIZADO POR', theend: 'Fin', thanks: '¡Gracias por jugar!', again: 'Vuelve a jugar en {host}',
-    page: 'página {n}', quips: ['CASI, CASI', 'PERDIDO EN LA TRADUCCIÓN', '¡CASI LO CLAVAS!', 'LA IA ME OBLIGÓ', 'TÉCNICAMENTE CORRECTO', 'SIN COMENTARIOS', 'CAOS: CONSEGUIDO', '¿¡QUIÉN ESCRIBIÓ ESTO!?', 'PERFECTAMENTE MAL'],
+    page: 'página {n}', remembered: 'Lo recordó como:', twists: { glimpse: 'Vistazo', peep: 'Mirilla', tv: 'Tele rota', memory: 'Modo memoria', words: 'Límite de palabras' }, quips: ['CASI, CASI', 'PERDIDO EN LA TRADUCCIÓN', '¡CASI LO CLAVAS!', 'LA IA ME OBLIGÓ', 'TÉCNICAMENTE CORRECTO', 'SIN COMENTARIOS', 'CAOS: CONSEGUIDO', '¿¡QUIÉN ESCRIBIÓ ESTO!?', 'PERFECTAMENTE MAL'],
   },
 };
 const fill = (s, v) => Object.entries(v || {}).reduce((a, [k, x]) => a.split('{' + k + '}').join(x), s);
@@ -193,6 +193,18 @@ function arrowBetween(doc, x1, y1, x2, y2, color) {
   return mx;
 }
 
+const TWIST_COLOR = { glimpse: C.cyan, peep: C.yellow, tv: C.pink, memory: C.lime, words: '#B98CFF' };
+/** Twist chip: coloured pill with a dark dot and the twist name. Returns its width. */
+function twistChip(doc, x, y, id, label) {
+  doc.font('inter800').fontSize(9);
+  const w = doc.widthOfString(label) + 26, col = TWIST_COLOR[id] || C.text;
+  doc.roundedRect(x, y, w, 15, 7.5).fill(col);
+  doc.circle(x + 8, y + 7.5, 4.2).fill(C.ink);
+  doc.circle(x + 8, y + 7.5, 1.8).fill(col);
+  doc.fillColor(C.ink).text(label, x + 15, y + 3.2, { lineBreak: false });
+  return w;
+}
+
 function stamp(doc, cx, cy, lines, color, angle) {
   doc.save().rotate(angle, { origin: [cx, cy] });
   doc.font('rubik900');
@@ -288,7 +300,7 @@ async function buildSouvenir(room, getImage, { lang = 'en', host = '' } = {}) {
     // short chains are drawn bigger so they fill their page
     let colW = 300, imgH = 210, fs = 15;
     const est = (cw, ih, f) => ch.steps.reduce((a, s) => {
-      if (s.type === 'image') return a + ih + 52;
+      if (s.type === 'image') return a + ih + 52 + (s.remembered ? 44 : 0);
       doc.font('inter800').fontSize(f);
       return a + Math.max(54, doc.heightOfString(clean(s.text) || t.no_text, { width: cw - 28, align: 'center' }) + 28) + 60;
     }, 0);
@@ -313,7 +325,7 @@ async function buildSouvenir(room, getImage, { lang = 'en', host = '' } = {}) {
       const left = i % 2 === 0, x = left ? xL : xR;
       const text = clean(s.text);
       doc.font('inter800').fontSize(fs);
-      const need = s.type === 'image' ? imgH + 30 : Math.max(54, doc.heightOfString(text || t.no_text, { width: colW - 28, align: 'center' }) + 28) + 44;
+      const need = s.type === 'image' ? imgH + 30 + (s.remembered ? 44 : 0) : Math.max(54, doc.heightOfString(text || t.no_text, { width: colW - 28, align: 'center' }) + 28) + 44;
       if (yy + need > bottom) {
         newPage();
         doc.font('inter800').fontSize(10.5).fillColor(C.pink).text(`${fill(t.chain, { c: ci + 1, C: room.chains.length })} · ${t.cont}`, M, 46, { characterSpacing: 2.5 });
@@ -328,7 +340,19 @@ async function buildSouvenir(room, getImage, { lang = 'en', host = '' } = {}) {
       const lw = doc.font('inter800').fontSize(11).widthOfString(`${num} ${stepName(s.type)}`);
       avatar(doc, x + lw + 16, yy + 6, 7.5, hue(s.by), emo(s.by));
       doc.font('inter700').fontSize(10).fillColor(C.muted).text(name(s.by), x + lw + 28, yy + 1);
+      if (s.twist && t.twists[s.twist]) {
+        const nw = doc.font('inter700').fontSize(10).widthOfString(name(s.by));
+        twistChip(doc, x + lw + 36 + nw, yy - 1, s.twist, t.twists[s.twist]);
+      }
       yy += 20;
+      if (s.type === 'image' && s.remembered) {
+        const rem = clean(s.remembered);
+        doc.save().roundedRect(x, yy, colW, 34, 9).fillOpacity(0.12).fill(C.lime).restore();
+        doc.save().roundedRect(x, yy, colW, 34, 9).lineWidth(1.6).dash(4, { space: 3 }).stroke(C.lime).undash().restore();
+        doc.font('inter700').fontSize(9.5).fillColor(C.lime).text(t.remembered, x + 10, yy + 6, { lineBreak: false });
+        doc.font('inter800').fontSize(11).fillColor(C.text).text(`“${rem}”`, x + 10, yy + 18, { width: colW - 20, lineBreak: false, ellipsis: true });
+        yy += 42;
+      }
       let h;
       if (s.type === 'image') h = imageBox(doc, x, yy, colW, imgH, s.img ? imgs.get(s.img) : null, t.no_image) + 6;
       else h = bubbleBox(doc, x, yy, colW, text || t.no_text, s.type === 'guess' ? C.guess : C.text, { fs });

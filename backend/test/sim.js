@@ -43,7 +43,7 @@ async function fullGame({ hostPort, playerPorts, N = 4, R = 3, label }) {
   const host = client(hostPort, '/api/ws'); // prefix-tolerant routing
   await host.open;
   assert.equal((await fetch(`http://localhost:${hostPort}/api/export/ZZZZ.pdf`)).status, 404);
-  host.send({ t: 'host_create', players: N + 1, rounds: R, timer: false });
+  host.send({ t: 'host_create', players: N + 1, rounds: R, timer: false, twists: false });
   const code = (await host.until((m) => m.t === 'host_ok')).code;
   const ps = [];
   for (let i = 0; i < N; i++) {
@@ -153,7 +153,7 @@ async function memoryTests() {
 
   // more than 12 players
   const big = client(3901); await big.open;
-  big.send({ t: 'host_create', players: 20, rounds: 3, timer: false });
+  big.send({ t: 'host_create', players: 20, rounds: 3, timer: false, twists: false });
   const bcode = (await big.until((m) => m.t === 'host_ok')).code;
   assert.equal((await big.until((m) => m.t === 'host_state')).expected, 20);
   for (let i = 0; i < 20; i++) { const p = client(3901); await p.open; p.send({ t: 'join', code: bcode, name: 'B' + i }); await p.until((m) => m.t === 'join_ok'); }
@@ -163,6 +163,52 @@ async function memoryTests() {
   console.log('  ✓ 20-player room');
   const em = (await big.until((m) => m.t === 'host_state')).players.map((p) => p.emoji);
   assert.equal(new Set(em).size, 20, 'random emoji are unique while unused ones remain');
+}
+
+async function twistTests() {
+  console.log('twists (forced)');
+  backend(3903, { TWIST_FORCE: 'memory,words' });
+  await sleep(500);
+  const host = client(3903); await host.open;
+  host.send({ t: 'host_create', players: 3, rounds: 3, timer: false });
+  const code = (await host.until((m) => m.t === 'host_ok')).code;
+  assert.equal((await host.until((m) => m.t === 'host_state')).twistsOn, true, 'twists on by default');
+  const ps = [];
+  for (let i = 0; i < 3; i++) { const p = client(3903); await p.open; p.send({ t: 'join', code, name: 'W' + i }); await p.until((m) => m.t === 'join_ok'); ps.push(p); }
+  host.send({ t: 'start' });
+  const r0 = await host.until((m) => m.t === 'host_state' && m.phase === 'round' && m.round === 0);
+  assert.equal(r0.twist, null, 'no twist on the prompt round');
+  for (let i = 0; i < 3; i++) { await ps[i].until((m) => m.round === 0); ps[i].send({ t: 'submit', data: 'a cat doing its taxes ' + i }); }
+  const r1 = await host.until((m) => m.t === 'host_state' && m.round === 1);
+  assert.equal(r1.twist, 'memory');
+  const t1 = await ps[0].until((m) => m.t === 'player_state' && m.round === 1);
+  assert.equal(t1.task.twist, 'memory');
+  ps[0].send({ t: 'submit', data: JPG });
+  assert.equal((await ps[0].until((m) => m.t === 'error')).code, 'bad_memory', 'memory needs the remembered text');
+  for (let i = 0; i < 3; i++) ps[i].send({ t: 'submit', data: JPG, remembered: 'a cat eating tacos ' + i });
+  const r2 = await host.until((m) => m.t === 'host_state' && m.round === 2);
+  assert.equal(r2.twist, 'words');
+  const t2 = await ps[1].until((m) => m.t === 'player_state' && m.round === 2);
+  assert.equal(t2.task.wordLimit, 5);
+  ps[1].send({ t: 'submit', data: 'one two three four five six' });
+  assert.equal((await ps[1].until((m) => m.t === 'error' && m.code === 'too_many_words')).code, 'too_many_words');
+  for (let i = 0; i < 3; i++) ps[i].send({ t: 'submit', data: 'cat eats tacos ' + i });
+  const rev = await host.until((m) => m.t === 'host_state' && m.phase === 'reveal');
+  const st = rev.chains[0].steps;
+  assert.equal(st[1].twist, 'memory'); assert.match(st[1].remembered, /tacos/);
+  assert.equal(st[2].twist, 'words'); assert.equal(st[0].twist, null);
+  const pdf = await fetch(`http://localhost:3903/export/${code}.pdf`);
+  assert.equal(pdf.status, 200);
+  // host can switch twists off in the lobby
+  host.send({ t: 'reveal_done' }); await host.until((m) => m.phase === 'end');
+  host.send({ t: 'again' }); await host.until((m) => m.phase === 'lobby');
+  host.send({ t: 'config', players: 3, rounds: 3, timer: false, twists: false });
+  await host.until((m) => m.t === 'host_state' && m.twistsOn === false);
+  host.send({ t: 'start' });
+  for (let i = 0; i < 3; i++) { await ps[i].until((m) => m.phase === 'round' && m.round === 0); ps[i].send({ t: 'submit', data: 'x' }); }
+  const off = await host.until((m) => m.t === 'host_state' && m.round === 1);
+  assert.equal(off.twist, null, 'no twists when switched off');
+  console.log('  ✓ memory needs remembered text, word limit enforced, twists in chains/PDF, switch off');
 }
 
 async function redisTests() {
@@ -181,7 +227,7 @@ async function redisTests() {
 
   // shared timer with custom durations: writing 60s*0.02 = 1.2s, image 150s*0.02 = 3s -> after ~2.3s exactly round 1
   const host = client(3912); await host.open;
-  host.send({ t: 'host_create', players: 3, rounds: 3, timer: true, tText: 60, tImage: 150 });
+  host.send({ t: 'host_create', players: 3, rounds: 3, timer: true, tText: 60, tImage: 150, twists: false });
   const code = (await host.until((m) => m.t === 'host_ok')).code;
   const ps = [];
   for (let i = 0; i < 3; i++) {
@@ -224,6 +270,7 @@ async function redisTests() {
   try { execSync('which redis-server', { stdio: 'ignore' }); } catch { hasRedis = false; }
   try {
     await memoryTests();
+    await twistTests();
     if (hasRedis) await redisTests();
     else console.log('(redis-server not found: skipping multi-replica tests)');
     console.log('ALL TESTS PASSED');
